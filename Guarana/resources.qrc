@@ -1,0 +1,19 @@
+<RCC>
+    <qresource prefix="/MainWindowIcons">
+        <file>icons/favorites_off.png</file>
+        <file>icons/favorites_on.png</file>
+        <file>icons/history_off.png</file>
+        <file>icons/history_on.png</file>
+        <file>icons/navigator_off.png</file>
+        <file>icons/navigator_on.png</file>
+        <file>icons/settings_off.png</file>
+        <file>icons/settings_on.png</file>
+        <file>icons/tags_off.png</file>
+        <file>icons/tags_on.png</file>
+        <file>icons/thrash_off.png</file>
+        <file>icons/thrash_on.png</file>
+    </qresource>
+    <qresource prefix="/App">
+        <file>icon.png</file>
+    </qresource>
+</RCC>
