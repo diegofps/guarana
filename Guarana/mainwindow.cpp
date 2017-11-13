@@ -40,6 +40,7 @@ void MainWindow::configureFor(QString & dataFolder)
 {
     qDebug(dataFolder.toLatin1());
     ui->stackedWidget->setCurrentIndex(0);
+    setWindowTitle("Guarana - " + dataFolder);
 }
 
 void MainWindow::onPageEnded()

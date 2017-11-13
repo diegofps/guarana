@@ -16,4 +16,9 @@
     <qresource prefix="/App">
         <file>icon.png</file>
     </qresource>
+    <qresource prefix="/Common">
+        <file>icons/ic_add.png</file>
+        <file>icons/ic_close.png</file>
+        <file>icons/ic_backspace.png</file>
+    </qresource>
 </RCC>
