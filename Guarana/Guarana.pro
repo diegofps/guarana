@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -52,7 +52,8 @@ HEADERS += \
     navigationtab.h \
     navigationform2.h \
     helpers/context.hpp \
-    comm/local/localbroadcast.hpp
+    comm/local/localbroadcast.hpp \
+    dal/dbmanager.hpp
 
 FORMS += \
     mainwindow.ui \
