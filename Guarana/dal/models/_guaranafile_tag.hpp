@@ -5,42 +5,53 @@ class _GuaranaFile_Tag
 {
 private:
 
-    long _id;
+    int _id;
 
-    long _guaranaFileId;
+    int _guaranaFileId;
 
-    long _tagId;
+    int _tagId;
 
 public:
 
-    _GuaranaFile_Tag()
+    _GuaranaFile_Tag() : _id(0)
     {
 
     }
 
-    _GuaranaFile_Tag(long guaranaFileId, long tagId) :
+    _GuaranaFile_Tag(int guaranaFileId, int tagId) :
+        _id(0),
         _guaranaFileId(guaranaFileId),
         _tagId(tagId)
     {
 
     }
 
-    long getGuaranaFileId() const
+    int getId() const
+    {
+        return _id;
+    }
+
+    int getGuaranaFileId() const
     {
         return _guaranaFileId;
     }
 
-    long getTagId() const
+    int getTagId() const
     {
         return _tagId;
     }
 
-    void setGuaranaFileId(const long guaranaFileId)
+    void setId(int id)
+    {
+        _id = id;
+    }
+
+    void setGuaranaFileId(const int guaranaFileId)
     {
         _guaranaFileId = guaranaFileId;
     }
 
-    void setTagId(const long tagId)
+    void setTagId(const int tagId)
     {
         _tagId = tagId;
     }

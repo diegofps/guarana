@@ -3,7 +3,9 @@
 
 #include <QVariant>
 #include <dal/models/tag.hpp>
+#include <helpers/merlin.hpp>
 #include <helpers/ptrlist.hpp>
+#include <viewmodels/fileviewmodel.hpp>
 #include "dal/basemanager.hpp"
 #include "dal/models/guaranafile.hpp"
 
@@ -24,52 +26,39 @@ public:
         gfile.setId(id);
     }
 
-    void getFiles(PtrList<Tag> & tagsFilter, QString textFilter, PtrList<GuaranaFile> & gfiles)
+    void filter(PtrList<Tag> & tagsFilter, QString textFilter, PtrList<GuaranaFile> & gfiles)
     {
         gfiles.clear();
 
-        QString whereTags;
-        if (!tagsFilter.isEmpty())
-        {
-            whereTags += "tagId IN (";
-            whereTags += tagsFilter.at(0)->getId();
+        QStringList wheres;
 
-            for (auto tag : tagsFilter)
-            {
-                whereTags += ", ";
-                whereTags += tag->getId();
-            }
+        for (Tag * tag : tagsFilter)
+            wheres.append(QString("EXISTS (SELECT ft.id FROM _guaranafile_tag ft WHERE tagId=%1 AND guaranaFileId=f.id)").arg(tag->getId()));
 
-            whereTags += ")";
-        }
+        if (!textFilter.isEmpty())
+            wheres.append(QString("filename LIKE '%%1%'").arg(textFilter));
 
-        QString whereText;
-        if (!whereText.isEmpty())
-        {
-            whereText += "name LIKE '%";
-            whereText += textFilter;
-            whereText += "%'";
-        }
 
-        QSqlQuery query("SELECT id, filename, uuid FROM GuaranaFiles");
+        QSqlQuery query;
+        if (wheres.isEmpty())
+            query.prepare("SELECT f.id, f.filename, f.uuid FROM GuaranaFiles f");
+        else
+            query.prepare("SELECT f.id, f.filename, f.uuid FROM GuaranaFiles f WHERE " + wheres.join(" AND "));
+
+        qDebug() << "Query:" << query.lastQuery();
+
         queryMany(query);
-
-        while(query.next()) {
+        while(query.next())
             gfiles.append(decodeModel(query));
-        }
-
-//        QSqlQuery query;
-//        query.prepare("SELECT ");
-
     }
 
-    QSqlQuery & encodeModel(QSqlQuery & query, GuaranaFile & gfile)
+    QSqlQuery & encodeModel(QSqlQuery & query, GuaranaFile & model)
     {
-        if (gfile.getId() != 0)
-            query.bindValue(":id", gfile.getId());
+        if (model.getId() != 0)
+            query.bindValue(":id", model.getId());
 
-        query.bindValue(":filename", gfile.getFilename());
-        query.bindValue(":uuid", gfile.getUuid());
+        query.bindValue(":filename", model.getFilename());
+        query.bindValue(":uuid", model.getUuid());
         return query;
     }
 

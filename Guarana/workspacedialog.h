@@ -25,15 +25,18 @@ private slots:
     void on_btAccept_clicked();
 
 private:
-    Ui::WorkspaceDialog *ui;
 
-    ConfigManager & _cm;
+    Ui::WorkspaceDialog * ui;
+
+    Context & _context;
 
     QStringList _candidateList;
 
-    MainWindow _mainWindow;
+    MainWindow * _mainWindow;
 
     bool selectItem(QString & dir);
+
+    void showMainWindow();
 
 };
 

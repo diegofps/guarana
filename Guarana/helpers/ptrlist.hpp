@@ -6,20 +6,36 @@
 template <typename T>
 class PtrList : public QList<T*>
 {
+private:
+
+    bool _ownsData;
+
 public:
+
+    PtrList(bool ownsData = true) :
+        _ownsData(ownsData)
+    {
+
+    }
 
     ~PtrList()
     {
-        for (auto ptr : *this)
-            delete ptr;
+        deleteElements();
     }
 
     void clear()
     {
-        for (auto ptr : *this)
-            delete ptr;
-
+        deleteElements();
         QList<T*>::clear();
+    }
+
+private:
+
+    void deleteElements()
+    {
+        if (_ownsData)
+            for (auto ptr : *this)
+                delete ptr;
     }
 
 };

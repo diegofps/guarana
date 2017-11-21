@@ -89,7 +89,7 @@ public:
         return hasPath && exists;
     }
 
-    QString & getDefaultDataFolder()
+    QString & getDefaultWorkspaceLocation()
     {
         return _defaultDataFolder;
     }

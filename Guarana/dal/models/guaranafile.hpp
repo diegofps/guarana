@@ -16,7 +16,7 @@ private:
 
 public:
 
-    GuaranaFile()
+    GuaranaFile() : _id(0)
     {
 
     }

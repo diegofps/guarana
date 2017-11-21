@@ -7,24 +7,25 @@ class Tag
 {
 private:
 
-    long _id;
+    int _id;
 
     QString _name;
 
 public:
 
-    Tag()
+    Tag() : _id(0)
     {
 
     }
 
     Tag(QString name) :
+        _id(0),
         _name(name)
     {
 
     }
 
-    long getId() const
+    int getId() const
     {
         return _id;
     }
@@ -34,7 +35,7 @@ public:
         return _name;
     }
 
-    void setId(const long id)
+    void setId(const int id)
     {
         _id = id;
     }

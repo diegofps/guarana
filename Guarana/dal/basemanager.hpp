@@ -9,6 +9,14 @@ class BaseManager
 {
 public:
 
+    int getLastId()
+    {
+        QSqlQuery query2("select last_insert_rowid()");
+        const int id = queryOne(query2).toInt();
+        qDebug("Inserted id: %d", id);
+        return id;
+    }
+
     void exec(QSqlQuery & query)
     {
         if (!query.exec())
@@ -35,9 +43,6 @@ public:
     void queryMany(QSqlQuery & query)
     {
         exec(query);
-
-        if (!query.next())
-            throw GuaranaException("Query returned nothing");
     }
 
 };

@@ -15,6 +15,19 @@ public:
     virtual void onWorkspaceReady() = 0;
 };
 
+class NavTabChangedListener
+{
+public:
+
+    class NavTabChangedEvent
+    {
+    public:
+        QString newName;
+    };
+
+    virtual void onTabChanged(const NavTabChangedEvent & event) = 0;
+};
+
 class LocalBroadcast
 {
 private:
@@ -22,6 +35,8 @@ private:
     QList<PagesEndedListener*> _pagesEndedListeners;
 
     QList<WorkspaceReadyListener*> _workspaceReadyListeners;
+
+    QList<NavTabChangedListener*> _navTabChangedListeners;
 
 public:
 
@@ -35,6 +50,11 @@ public:
         _workspaceReadyListeners.append(listener);
     }
 
+    void registerNavTabChangedListener(NavTabChangedListener * listener)
+    {
+        _navTabChangedListeners.append(listener);
+    }
+
     void sendPagesEnded()
     {
         for (auto listener : _pagesEndedListeners)
@@ -45,6 +65,12 @@ public:
     {
         for (auto listener : _workspaceReadyListeners)
             listener->onWorkspaceReady();
+    }
+
+    void sendNavTabChanged(const NavTabChangedListener::NavTabChangedEvent & event)
+    {
+        for (auto listener : _navTabChangedListeners)
+            listener->onTabChanged(event);
     }
 
 };

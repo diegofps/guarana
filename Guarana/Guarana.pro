@@ -68,7 +68,8 @@ HEADERS += \
     helpers/ioutils.hpp \
     helpers/ptrlist.hpp \
     widgetmodels/filetablemodel.hpp \
-    helpers/randomhelper.hpp
+    helpers/randomhelper.hpp \
+    widgetmodels/taglistmodel.hpp
 
 FORMS += \
     mainwindow.ui \

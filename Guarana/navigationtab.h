@@ -3,10 +3,13 @@
 
 #include <QWidget>
 #include <QAbstractTableModel>
+#include <QCompleter>
 
 #include <widgetmodels/filetablemodel.hpp>
+#include <widgetmodels/taglistmodel.hpp>
 
 #include "helpers/context.hpp"
+
 
 namespace Ui {
 class NavigationTab;
@@ -22,9 +25,13 @@ private:
 
     void configureTagFilter();
 
+    void configureTagList();
+
     void addFiles(QStringList filepaths);
 
     void updateFiles();
+
+    void updateTagOptions();
 
 protected:
 
@@ -44,6 +51,16 @@ private slots:
 
     void showContextMenu(const QPoint &);
 
+    void on_tagFilter_returnPressed();
+
+    void on_btClearTagFilter_clicked();
+
+    void on_btClearTextFilter_clicked();
+
+    void on_textFilter_returnPressed();
+
+    void on_tagsList_doubleClicked(const QModelIndex &index);
+
 private:
 
     Ui::NavigationTab *ui;
@@ -54,7 +71,11 @@ private:
 
     Context & _context;
 
-    PtrList<Tag> _selectedTags;
+    TagListModel _selectedTags;
+
+    TagListModel _tagOptions;
+
+    QCompleter _tagCompleter;
 
 };
 
