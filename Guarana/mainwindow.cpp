@@ -4,7 +4,7 @@
 MainWindow::MainWindow(Context & context, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    _cm(context.getConfigManager())
+    _context(context)
 {
     ui->setupUi(this);
 
@@ -39,8 +39,11 @@ MainWindow::~MainWindow()
 void MainWindow::configureFor(QString & dataFolder)
 {
     qDebug(dataFolder.toLatin1());
+    _context.getWorkspace().setWorkspace(dataFolder);
     ui->stackedWidget->setCurrentIndex(0);
     setWindowTitle("Guarana - " + dataFolder);
+
+    _context.getLocalBroadcast().sendWorkspaceReady();
 }
 
 void MainWindow::onPageEnded()

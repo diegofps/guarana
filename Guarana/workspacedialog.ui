@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>653</width>
-    <height>116</height>
+    <height>122</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -50,6 +50,9 @@
    </item>
    <item>
     <widget class="QLabel" name="msgLabel">
+     <property name="styleSheet">
+      <string notr="true">color: rgb(170, 0, 0);</string>
+     </property>
      <property name="text">
       <string/>
      </property>
@@ -87,11 +90,6 @@
     </layout>
    </item>
   </layout>
-  <zorder>label</zorder>
-  <zorder>msgLabel</zorder>
-  <zorder>layoutWidget</zorder>
-  <zorder>layoutWidget</zorder>
-  <zorder>btBrowse</zorder>
  </widget>
  <resources/>
  <connections>

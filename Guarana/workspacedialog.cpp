@@ -66,7 +66,7 @@ void WorkspaceDialog::on_btAccept_clicked()
     QString dir = ui->cbDataFolders->currentText();
     QDir tmp;
 
-    if (tmp.exists(dir) || tmp.mkdir(dir))
+    if (tmp.exists(dir) || tmp.mkpath(dir))
     {
         hide();
 
