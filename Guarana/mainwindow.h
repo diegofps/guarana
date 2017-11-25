@@ -53,7 +53,7 @@ private:
 
     Ui::MainWindow *ui;
 
-    ConfigManager & _cm;
+    Context & _context;
 
     NavigationForm2 * _navigationForm2;
 

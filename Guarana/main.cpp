@@ -24,17 +24,17 @@ int main(int argc, char *argv[])
     Context context;
     WorkspaceDialog d(context);
 
-    DBManager db(context.getConfigManager().getDefaultDataFolder() + "/guarana.db");
-    QStringList names;
+//    DBManager db(context.getConfigManager().getDefaultDataFolder() + "/guarana.db");
+//    QStringList names;
 
-    db.addName("Diego");
-    db.addName("Aline");
-    db.getNames(names);
+//    db.addName("Diego");
+//    db.addName("Aline");
+//    db.getNames(names);
 
-    for (auto & name : names)
-    {
-        qDebug(name.toLatin1());
-    }
+//    for (auto & name : names)
+//    {
+//        qDebug(name.toLatin1());
+//    }
 
     return a.exec();
 }

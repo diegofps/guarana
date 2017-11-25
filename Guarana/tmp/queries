@@ -1,0 +1,5 @@
+
+select f.id, f.filename from guaranafiles f
+where exists(select ft.id from _guaranafile_tag ft where tagId=1 and guaranaFileId=f.id) and 
+      exists(select ft.id from _guaranafile_tag ft where tagId=2 and guaranaFileId=f.id) and
+      f.filename like '%la%';

@@ -53,7 +53,23 @@ HEADERS += \
     navigationform2.h \
     helpers/context.hpp \
     comm/local/localbroadcast.hpp \
-    dal/dbmanager.hpp
+    dal/managers/tag_manager.hpp \
+    dal/managers/guaranafile_manager.hpp \
+    dal/models/guaranafile.hpp \
+    dal/models/tag.hpp \
+    dal/managers/_guaranafile_tag_manager.hpp \
+    dal/models/_guaranafile_tag.hpp \
+    dal/workspace.hpp \
+    dal/basemanager.hpp \
+    dal/dbmanager.hpp \
+    viewmodels/fileviewmodel.hpp \
+    helpers/merlin.hpp \
+    helpers/datehelper.hpp \
+    helpers/ioutils.hpp \
+    helpers/ptrlist.hpp \
+    widgetmodels/filetablemodel.hpp \
+    helpers/randomhelper.hpp \
+    widgetmodels/taglistmodel.hpp
 
 FORMS += \
     mainwindow.ui \

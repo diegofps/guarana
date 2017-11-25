@@ -4,7 +4,7 @@
 MainWindow::MainWindow(Context & context, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    _cm(context.getConfigManager())
+    _context(context)
 {
     ui->setupUi(this);
 
@@ -21,8 +21,12 @@ MainWindow::MainWindow(Context & context, QWidget *parent) :
     ui->stackedWidget->addWidget(_tagsForm);
     ui->stackedWidget->addWidget(_thrashForm);
     ui->stackedWidget->addWidget(_settingsForm);
+    ui->stackedWidget->setCurrentIndex(0);
+
+    setWindowTitle("Guarana - " + context.getWorkspace().getRootLocation());
 
     context.getLocalBroadcast().registerPageEndedListener(this);
+    context.getLocalBroadcast().sendWorkspaceReady();
 }
 
 MainWindow::~MainWindow()
@@ -38,9 +42,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::configureFor(QString & dataFolder)
 {
-    qDebug(dataFolder.toLatin1());
-    ui->stackedWidget->setCurrentIndex(0);
-    setWindowTitle("Guarana - " + dataFolder);
+
 }
 
 void MainWindow::onPageEnded()

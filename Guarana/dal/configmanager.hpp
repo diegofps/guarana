@@ -34,7 +34,7 @@ public:
 
     ConfigManager()
     {
-        qDebug("Settings file is at: " + getConfigFilename().toLatin1());
+        qDebug("Settings file is at: %s", getConfigFilename().toLatin1().data());
         if (!load())
             loadDefault();
     }
@@ -89,7 +89,7 @@ public:
         return hasPath && exists;
     }
 
-    QString & getDefaultDataFolder()
+    QString & getDefaultWorkspaceLocation()
     {
         return _defaultDataFolder;
     }
