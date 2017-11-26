@@ -4,6 +4,8 @@
 #include <QCompleter>
 #include <QMimeData>
 #include <QMenu>
+#include <QMessageBox>
+#include <QDirIterator>
 
 NavigationTab::NavigationTab(Context & context, int id, QWidget *parent) :
     QWidget(parent),
@@ -76,12 +78,10 @@ void NavigationTab::configureTagList()
     ui->tagsList->setModel(&_selectedTags);
 }
 
-void NavigationTab::addFiles(QStringList filepaths)
+void NavigationTab::addFiles(QStringList & filepaths)
 {
     for (auto & filepath : filepaths)
-        _context.getWorkspace().copyFileFromFS(filepath, _selectedTags.getModel());
-
-    updateFiles();
+        _context.getWorkspace().copyFromFS(filepath, _selectedTags.getModel());
 }
 
 void NavigationTab::updateFiles()
@@ -120,19 +120,70 @@ void NavigationTab::dropEvent(QDropEvent *event)
 
     if (mimeData->hasUrls())
     {
-        qDebug("It has");
-        QStringList pathList;
+        qDebug("Mime has urls");
+        QStringList filesList;
         QList<QUrl> urlList = mimeData->urls();
 
         for (int i = 0; i < urlList.size(); ++i)
-            if (urlList.at(i).isLocalFile())
-                pathList.append(urlList.at(i).toLocalFile());
+        {
+            auto & url = urlList.at(i);
+            if (url.isLocalFile())
+            {
+                QString filename = url.toLocalFile();
+                QFileInfo info(filename);
 
-        addFiles(pathList);
+                if (info.isDir())
+                {
+                    QMessageBox box;
+                    box.setWindowTitle("Add folder");
+                    box.setText(filename + " is a local folder.\n\nWould you like to add the folder or its files?");
+                    box.addButton("&Cancel", QMessageBox::YesRole);
+                    box.addButton("F&iles", QMessageBox::YesRole);
+                    box.addButton("&Folder", QMessageBox::YesRole);
+
+                    box.exec();
+
+                    if (box.clickedButton() == box.buttons().at(1))
+                    {
+                        qDebug() << "Add files selected";
+                        QDirIterator dirIt(filename, QDirIterator::Subdirectories);
+                        while(dirIt.hasNext())
+                        {
+                            QString current = dirIt.next();
+                            QFileInfo currentInfo(current);
+
+                            if (currentInfo.isSymLink() || currentInfo.isDir())
+                                continue;
+
+                            qDebug() << "Adding file: " << current;
+                            filesList.append(current);
+                        }
+                    }
+
+                    else if (box.clickedButton() == box.buttons().at(2))
+                    {
+                        qDebug() << "Add folder selected";
+                        filesList.append(filename);
+                    }
+
+                    else
+                    {
+                        qDebug() << "Cancel selected";
+                    }
+                }
+                else
+                {
+                    filesList.append(filename);
+                }
+            }
+        }
+
+        addFiles(filesList);
+        updateFiles();
     }
     else
     {
-        qDebug("It doesnt");
+        qDebug("Mime doesnt have urls");
     }
 }
 

@@ -40,7 +40,7 @@ public:
         _db = new DBManager(_workspace + "/guarana.db");
     }
 
-    void copyFileFromFS(QString filepath, PtrList<Tag> & tags)
+    void copyFromFS(QString filepath, PtrList<Tag> & tags)
     {
         QFileInfo fi(filepath);
         GuaranaFile gfile(fi.fileName(), RandomHelper::createGuid());
@@ -49,7 +49,10 @@ public:
         QString innerFilePath = getFilePath(gfile);
 
         QDir().mkpath(innerFileLocation);
-        QFile::copy(filepath, innerFilePath);
+        if (fi.isDir())
+            IOUtils::copyDir(filepath, innerFilePath);
+        else
+            QFile::copy(filepath, innerFilePath);
 
         TagManager & tm = _db->getTagManager();
         GuaranaFileManager & gfm = _db->getGuaranaFileManager();

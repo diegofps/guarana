@@ -20,7 +20,7 @@ public:
         QString dateCreated = DateHelper::formatDateTime(fi.created());
         QString lastRead = DateHelper::formatDateTime(fi.lastRead());
         QString lastModification = DateHelper::formatDateTime(fi.lastModified());
-        QString size = IOUtils::getReadableSize(fi.size());
+        QString size = fi.isDir() ? "" : IOUtils::getReadableSize(fi.size());
 
         model.setFilename(data.getFilename());
         model.setGuaranaFileid(data.getId());

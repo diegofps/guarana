@@ -27,7 +27,9 @@ private:
 
     void configureTagList();
 
-    void addFiles(QStringList filepaths);
+    void addFiles(QStringList & filepaths);
+
+    void addFolders(QStringList & folderpaths);
 
     void updateFiles();
 
