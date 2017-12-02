@@ -56,6 +56,18 @@ public:
         return _workspace + "/new";
     }
 
+    void remove(GuaranaFile & file)
+    {
+        if (file.getId() == 0)
+            return;
+
+        auto date = QDateTime::currentDateTime();
+        file.setRemovedDate(date);
+        file.isRemoved(true);
+
+        _db->getGuaranaFileManager().update(file);
+    }
+
     void copyFromFS(QString filepath, PtrList<Tag> & tags)
     {
         QFileInfo fi(filepath);

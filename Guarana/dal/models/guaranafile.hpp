@@ -14,6 +14,8 @@ private:
 
     QString _uuid;
 
+    bool _isAlive;
+
 public:
 
     GuaranaFile() : _id(0)
@@ -24,7 +26,8 @@ public:
     GuaranaFile(const QString filename, const QString uuid) :
         _id(0),
         _filename(filename),
-        _uuid(uuid)
+        _uuid(uuid),
+        _isAlive(true)
     {
 
     }
@@ -44,6 +47,11 @@ public:
         return _uuid;
     }
 
+    bool isAlive() const
+    {
+        return _isAlive;
+    }
+
     void setId(const int id)
     {
         _id = id;
@@ -57,6 +65,11 @@ public:
     void setUuid(const QString uuid)
     {
         _uuid = uuid;
+    }
+
+    void setIsAlive(const bool isAlive)
+    {
+        _isAlive = isAlive;
     }
 
 };

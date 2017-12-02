@@ -336,5 +336,15 @@ void NavigationTab::pasteElements()
 
 void NavigationTab::removeElements()
 {
+    QModelIndexList indexes = ui->resultTable->selectionModel()->selectedRows();
+
     qDebug() << "Remove";
+    for (auto index : indexes)
+    {
+        FileViewModel * ptr = _model.getModel().at(index.row());
+        _context.getWorkspace().remove(ptr);
+        qDebug() << index.row() << ", " << index.column() << ": " << ptr->getFilename();
+    }
+
+    updateFiles();
 }
