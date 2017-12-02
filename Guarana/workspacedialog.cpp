@@ -8,19 +8,19 @@ WorkspaceDialog::WorkspaceDialog(Context & context, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::WorkspaceDialog),
     _context(context),
-    _candidateList(_context.getConfigManager().getDataFolders()),
+    _candidateList(_context.getConfigManager().getWorkspaceLocations()),
     _mainWindow(nullptr)
 {
     ui->setupUi(this);
 
-    if (_context.getConfigManager().hasDefaultDataFolder())
+    if (_context.getConfigManager().hasLastWorkspaceLocation())
     {
         showMainWindow();
     }
     else
     {
         show();
-        ui->cbDataFolders->addItems(_context.getConfigManager().getDataFolders());
+        ui->cbDataFolders->addItems(_context.getConfigManager().getWorkspaceLocations());
     }
 }
 
@@ -63,8 +63,8 @@ bool WorkspaceDialog::selectItem(QString & dir)
 void WorkspaceDialog::showMainWindow()
 {
     hide();
-    QString path = _context.getConfigManager().getDefaultWorkspaceLocation();
-    _context.getWorkspace().setWorkspaceLocation(path);
+    QString path = _context.getConfigManager().getLastWorkspaceLocation();
+    _context.openWorkspace(path);
     _mainWindow = new MainWindow(_context);
     _mainWindow->show();
 }
@@ -76,8 +76,8 @@ void WorkspaceDialog::on_btAccept_clicked()
 
     if (tmp.exists(dir) || tmp.mkpath(dir))
     {
-        _context.getConfigManager().setDefaultDataFolder(dir);
-        _context.getConfigManager().save();
+        _context.getConfigManager().setLastWorkspaceLocation(dir);
+        _context.getConfigManager().saveSettings();
 
         showMainWindow();
     }

@@ -109,13 +109,6 @@ void NavigationTab::dragEnterEvent(QDragEnterEvent *event)
 
 void NavigationTab::dropEvent(QDropEvent *event)
 {
-    qDebug() << "Here" ;
-//    const QMimeData * mimeData = event->mimeData();
-//    if (mimeData->hasUrls())
-//    {
-//        QString txt = mimeData->text();
-//        qDebug() << txt;
-//    }
     const QMimeData *mimeData = event->mimeData();
 
     if (mimeData->hasUrls())
@@ -187,19 +180,96 @@ void NavigationTab::dropEvent(QDropEvent *event)
     }
 }
 
+void NavigationTab::createActions(QMenu & parentMenu,
+                                  FileMap & parentFile,
+                                  PtrList<QAction> & actionsList,
+                                  PtrList<QMenu> & menusList,
+                                  PtrList<Receiver> & receiversList)
+{
+    for (FileMap * file : parentFile)
+    {
+        if (file->isDir())
+        {
+            QMenu * menu = new QMenu(file->getName(), this);
+            parentMenu.addMenu(menu);
+            menusList.append(menu);
+
+            createActions(*menu, *file, actionsList, menusList, receiversList);
+        }
+        else
+        {
+            QAction * action = new QAction(file->getName(), this);
+            parentMenu.addAction(action);
+            actionsList.append(action);
+
+            Receiver * receiver = new Receiver(file->getPath());
+            receiversList.append(receiver);
+
+            connect(action, &QAction::triggered, receiver, &Receiver::triggered );
+        }
+    }
+}
+
 void NavigationTab::showContextMenu(const QPoint & pos)
 {
     QMenu contextMenu(tr("Context menu"), this);
 
-    QAction action1("Remove Data Point", this);
-    //connect(&action1, SIGNAL(triggered()), this, SLOT(removeDataPoint()));
-    contextMenu.addAction(&action1);
+    QAction rename("Rename", this);
+    QAction cut("Cut", this);
+    QAction copy("Copy", this);
+    QAction paste("Paste", this);
+    QAction remove("Remove", this);
+
+    PtrList<QMenu> menuList;
+    PtrList<QAction> actionsList;
+    PtrList<Receiver> receiverList;
+
+    FileMap & newFiles = _context.getTemplates();
+    QMenu menuNewFile(newFiles.getName(), this);
+    createActions(menuNewFile, newFiles, actionsList, menuList, receiverList);
+
+    FileMap & execActions = _context.getActions();
+    QMenu menuExecActions(execActions.getName(), this);
+    createActions(menuExecActions, execActions, actionsList, menuList, receiverList);
+
+    //connect(&templates, &QAction::triggered, [&]() { this->createFromTemplate(filepath); } );
+
+    connect(&rename, SIGNAL( triggered() ), this, SLOT( renameElements() ));
+    connect(&cut, SIGNAL( triggered() ), this, SLOT( cutElements() ));
+    connect(&copy, SIGNAL( triggered() ), this, SLOT( copyElements() ));
+    connect(&paste, SIGNAL( triggered() ), this, SLOT( pasteElements() ));
+    connect(&remove, SIGNAL( triggered() ), this, SLOT( removeElements() ));
+
+    contextMenu.addMenu(&menuNewFile);
+    contextMenu.addMenu(&menuExecActions);
+    contextMenu.addSeparator();
+    contextMenu.addAction(&cut);
+    contextMenu.addAction(&copy);
+    contextMenu.addAction(&paste);
+    contextMenu.addAction(&rename);
+    contextMenu.addSeparator();
+    contextMenu.addAction(&remove);
 
     // Cria um novo ponto fazendo a translação para o QTableView
-    QPoint p2(pos.x() + ui->resultTable->x() + ui->splitter->x(),
-              pos.y() + ui->resultTable->y() + ui->splitter->y());
 
+//    Abordagem antiga
+//    QPoint p2(pos.x() + ui->resultTable->x() + ui->splitter->x(),
+//              pos.y() + ui->resultTable->y() + ui->splitter->y());
+
+//    Nova abordagem
+    QPoint p2(pos.x(), pos.y());
+    QWidget *current = ui->resultTable;
+    while(current != nullptr && current != this)
+    {
+        p2.setX(p2.x() + current->x());
+        p2.setY(p2.y() + current->y());
+        current = current->parentWidget();
+    }
+
+    qDebug() << "Context started";
     contextMenu.exec(mapToGlobal(p2));
+    qDebug() << "Context ended";
+
 }
 
 void NavigationTab::on_tagFilter_returnPressed()
@@ -242,4 +312,29 @@ void NavigationTab::on_tagsList_doubleClicked(const QModelIndex &index)
     _selectedTags.getModel().removeAt(index.row());
     _selectedTags.refresh();
     updateFiles();
+}
+
+void NavigationTab::renameElements()
+{
+    qDebug() << "Rename";
+}
+
+void NavigationTab::cutElements()
+{
+    qDebug() << "Cut";
+}
+
+void NavigationTab::copyElements()
+{
+    qDebug() << "Copy";
+}
+
+void NavigationTab::pasteElements()
+{
+    qDebug() << "Paste";
+}
+
+void NavigationTab::removeElements()
+{
+    qDebug() << "Remove";
 }

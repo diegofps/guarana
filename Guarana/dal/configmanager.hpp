@@ -17,41 +17,32 @@ private:
     const char * const DATA_FOLDER_PATH = "dataFolderPath";
     const char * const DATA_FOLDERS = "dataFolders";
 
-    QString _defaultDataFolder;
+    QString _lasltWorkspaceLocation;
     QStringList _dataFolders;
-
-    QString getConfigFilename() const
-    {
-        return EnvHelper::getLocalAppFolder() + "/guarana.settings";
-    }
-
-    QString getRecommendedDataFolder() const
-    {
-        return EnvHelper::getHomeFolder() + "/Dropbox/Guarana";
-    }
 
 public:
 
     ConfigManager()
     {
         qDebug("Settings file is at: %s", getConfigFilename().toLatin1().data());
-        if (!load())
-            loadDefault();
+
+        if (!loadSettings())
+            loadDefaultSettings();
     }
 
-    void loadDefault()
+    void loadDefaultSettings()
     {
-        _defaultDataFolder = "";
+        _lasltWorkspaceLocation = "";
         _dataFolders.append(getRecommendedDataFolder());
         qDebug("Loaded default settings");
     }
 
-    bool load()
+    bool loadSettings()
     {
         try
         {
             QJsonObject settings = JsonHelper::load(getConfigFilename());
-            _defaultDataFolder = settings[DEFAULT_DATA_FOLDER].toString();
+            _lasltWorkspaceLocation = settings[DEFAULT_DATA_FOLDER].toString();
 
             QJsonArray jDataFolders = settings[DATA_FOLDERS].toArray();
             JsonHelper::cast(jDataFolders, _dataFolders);
@@ -69,34 +60,34 @@ public:
         }
     }
 
-    void save()
+    void saveSettings()
     {
         QJsonArray jDataFolders;
         JsonHelper::cast(_dataFolders, jDataFolders);
 
         QJsonObject jSettings;
-        jSettings[DEFAULT_DATA_FOLDER] = _defaultDataFolder;
+        jSettings[DEFAULT_DATA_FOLDER] = _lasltWorkspaceLocation;
         jSettings[DATA_FOLDERS] = jDataFolders;
 
         JsonHelper::save(jSettings, getConfigFilename());
         qDebug("Settings saved");
     }
 
-    bool hasDefaultDataFolder() const
+    bool hasLastWorkspaceLocation() const
     {
-        bool hasPath = !_defaultDataFolder.isEmpty();
-        bool exists = QDir().exists(_defaultDataFolder);
+        bool hasPath = !_lasltWorkspaceLocation.isEmpty();
+        bool exists = QDir().exists(_lasltWorkspaceLocation);
         return hasPath && exists;
     }
 
-    QString & getDefaultWorkspaceLocation()
+    QString & getLastWorkspaceLocation()
     {
-        return _defaultDataFolder;
+        return _lasltWorkspaceLocation;
     }
 
-    void setDefaultDataFolder(QString & dataFolder)
+    void setLastWorkspaceLocation(QString & dataFolder)
     {
-        _defaultDataFolder = dataFolder;
+        _lasltWorkspaceLocation = dataFolder;
         if (!_dataFolders.contains(dataFolder))
         {
             _dataFolders.append(dataFolder);
@@ -104,9 +95,29 @@ public:
         }
     }
 
-    const QStringList & getDataFolders() const
+    const QStringList & getWorkspaceLocations() const
     {
         return _dataFolders;
+    }
+
+    QString getConfigFilename() const
+    {
+        return EnvHelper::getLocalAppFolder() + "/guarana.settings";
+    }
+
+    QString getGlobalActionsDir() const
+    {
+        return EnvHelper::getLocalAppFolder() + "/actions";
+    }
+
+    QString getGlobalTemplatesDir() const
+    {
+        return EnvHelper::getLocalAppFolder() + "/new";
+    }
+
+    QString getRecommendedDataFolder() const
+    {
+        return EnvHelper::getHomeFolder() + "/Dropbox/Guarana";
     }
 
 };

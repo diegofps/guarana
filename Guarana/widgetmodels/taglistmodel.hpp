@@ -50,7 +50,7 @@ public:
 
     void refresh()
     {
-        emit dataChanged(createIndex(0, 0), createIndex(_tags.size(), 0));
+        emit dataChanged(createIndex(0, 0), createIndex(_tags.size(), 1));
         emit layoutChanged();
     }
 

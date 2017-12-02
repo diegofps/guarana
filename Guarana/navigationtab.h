@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QAbstractTableModel>
 #include <QCompleter>
+#include <QMenu>
 
 #include <widgetmodels/filetablemodel.hpp>
 #include <widgetmodels/taglistmodel.hpp>
@@ -14,6 +15,32 @@
 namespace Ui {
 class NavigationTab;
 }
+
+class Receiver : public QObject
+{
+
+    Q_OBJECT
+
+private:
+
+    QString & _filepath;
+
+public:
+
+    Receiver(QString & filepath) :
+        _filepath(filepath)
+    {
+
+    }
+
+public slots:
+
+    void triggered()
+    {
+        qDebug() << _filepath;
+    }
+
+};
 
 class NavigationTab : public QWidget, WorkspaceReadyListener
 {
@@ -34,6 +61,9 @@ private:
     void updateFiles();
 
     void updateTagOptions();
+
+    void createActions(QMenu &parentMenu, FileMap &file, PtrList<QAction> & actionsList, PtrList<QMenu> & menuList,
+                       PtrList<Receiver> & receiversList);
 
 protected:
 
@@ -62,6 +92,16 @@ private slots:
     void on_textFilter_returnPressed();
 
     void on_tagsList_doubleClicked(const QModelIndex &index);
+
+    void renameElements();
+
+    void cutElements();
+
+    void copyElements();
+
+    void pasteElements();
+
+    void removeElements();
 
 private:
 

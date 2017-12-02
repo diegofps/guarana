@@ -23,6 +23,8 @@ private:
 
     DBManager * _db;
 
+    QString _workspace;
+
 public:
 
     Workspace() : _db(nullptr)
@@ -38,6 +40,20 @@ public:
             delete _db;
 
         _db = new DBManager(_workspace + "/guarana.db");
+
+        QDir tmp;
+        tmp.mkpath(getWorkspaceTemplatesDir());
+        tmp.mkpath(getWorkspaceActionsDir());
+    }
+
+    QString getWorkspaceActionsDir() const
+    {
+        return _workspace + "/actions";
+    }
+
+    QString getWorkspaceTemplatesDir() const
+    {
+        return _workspace + "/new";
     }
 
     void copyFromFS(QString filepath, PtrList<Tag> & tags)
@@ -118,10 +134,6 @@ public:
     {
         return _workspace;
     }
-
-private:
-
-    QString _workspace;
 
 };
 

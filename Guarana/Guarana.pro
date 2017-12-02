@@ -4,7 +4,8 @@
 #
 #-------------------------------------------------
 
-QT       += core gui sql
+QT     += core gui sql
+CONFIG += c++14
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -69,7 +70,8 @@ HEADERS += \
     helpers/ptrlist.hpp \
     widgetmodels/filetablemodel.hpp \
     helpers/randomhelper.hpp \
-    widgetmodels/taglistmodel.hpp
+    widgetmodels/taglistmodel.hpp \
+    helpers/filemap.hpp
 
 FORMS += \
     mainwindow.ui \
