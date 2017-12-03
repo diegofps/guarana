@@ -23,7 +23,7 @@ MainWindow::MainWindow(Context & context, QWidget *parent) :
     ui->stackedWidget->addWidget(_settingsForm);
     ui->stackedWidget->setCurrentIndex(0);
 
-    setWindowTitle("Guarana - " + context.getWorkspace().getRootLocation());
+    setWindowTitle("Guarana - " + context.getWorkspace().getLocation());
 
     context.getLocalBroadcast().registerPageEndedListener(this);
     context.getLocalBroadcast().sendWorkspaceReady();

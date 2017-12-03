@@ -341,7 +341,7 @@ QPushButton:hover{
        <string notr="true">background-color::checked: rgb(255, 170, 0);</string>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>-1</number>
       </property>
      </widget>
     </item>
@@ -356,41 +356,59 @@ QPushButton:hover{
      <height>20</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionSwitch_workspace"/>
+    <addaction name="separator"/>
+    <addaction name="actionImport_files"/>
+    <addaction name="actionExport_files"/>
+    <addaction name="separator"/>
+    <addaction name="actionQuit"/>
+   </widget>
+   <widget class="QMenu" name="menuEdit">
+    <property name="title">
+     <string>Edit</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="actionAbout"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuEdit"/>
+   <addaction name="menuHelp"/>
   </widget>
+  <action name="actionSwitch_workspace">
+   <property name="text">
+    <string>Change workspace</string>
+   </property>
+  </action>
+  <action name="actionQuit">
+   <property name="text">
+    <string>Quit</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="text">
+    <string>About</string>
+   </property>
+  </action>
+  <action name="actionImport_files">
+   <property name="text">
+    <string>Import files...</string>
+   </property>
+  </action>
+  <action name="actionExport_files">
+   <property name="text">
+    <string>Export files...</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <customwidgets>
-  <customwidget>
-   <class>FavoritesForm</class>
-   <extends>QWidget</extends>
-   <header>favoritesform.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>HistoryForm</class>
-   <extends>QWidget</extends>
-   <header>historyform.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>TagsForm</class>
-   <extends>QWidget</extends>
-   <header>tagsform.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>ThrashForm</class>
-   <extends>QWidget</extends>
-   <header>thrashform.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>SettingsForm</class>
-   <extends>QWidget</extends>
-   <header>settingsform.h</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
  <resources>
   <include location="resources.qrc"/>
  </resources>

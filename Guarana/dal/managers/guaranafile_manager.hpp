@@ -1,6 +1,7 @@
 #ifndef FILEMANAGER_HPP
 #define FILEMANAGER_HPP
 
+#include <QStringBuilder>
 #include <QVariant>
 #include <dal/models/tag.hpp>
 #include <helpers/merlin.hpp>
@@ -39,6 +40,26 @@ public:
         exec(encodeModel(query, file));
     }
 
+    void destroyAll(QList<int> & ids)
+    {
+        if (ids.isEmpty())
+            return;
+
+        QString strQuery;
+        strQuery += "DELETE FROM GuaranaFiles WHERE id IN (";
+        strQuery += QString::number(ids.first());
+        for (int i=1;i<ids.size();++i)
+        {
+            strQuery += ",";
+            strQuery += QString::number(ids[i]);
+        }
+        strQuery += ")";
+
+        QSqlQuery query;
+        query.prepare(strQuery);
+        exec(query);
+    }
+
     void getById(int fileId, GuaranaFile & file)
     {
         QSqlQuery query;
@@ -48,6 +69,8 @@ public:
         exec(query);
         if (query.next())
             decodeModel(query, file);
+        else
+            file.setId(0);
     }
 
     void filter(PtrList<Tag> & tagsFilter, QString textFilter, PtrList<GuaranaFile> & gfiles, bool isAlive)

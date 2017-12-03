@@ -65,7 +65,7 @@ public:
         _files->clear();
     }
 
-    void addFolder(QString path)
+    void addFolder(QString path, bool allowFolders)
     {
         QDirIterator it(path);
         while(it.hasNext())
@@ -82,14 +82,23 @@ public:
             FileMap * child;
             if (info.isDir())
             {
-                qDebug() << "Parsing folder " << current;
-                child = new FileMap(info.baseName(), current, true);
-                child->addFolder(current);
+                if (info.baseName().startsWith("_"))
+                {
+                    qDebug() << "Parsing folder as single entity " << current;
+                    QString basename = info.baseName();
+                    child = new FileMap(basename.mid(1, basename.length()), current, false);
+                }
+                else
+                {
+                    qDebug() << "Parsing folder " << current;
+                    child = new FileMap(info.fileName(), current, true);
+                    child->addFolder(current, allowFolders);
+                }
             }
             else
             {
                 qDebug() << "Parsing file " << current;
-                child = new FileMap(info.baseName(), current, false);
+                child = new FileMap(info.fileName(), current, false);
             }
 
             _files->append(child);
@@ -100,14 +109,10 @@ public:
 
     static bool cmpFilesLessThan(FileMap *& f1, FileMap *& f2)
     {
-        if ( (f1->isDir() && f2->isDir()) || (!f1->isDir() && !f2->isDir()))
+        if ( f1->isDir() == f2->isDir())
             return f1->getName() < f2->getName();
-
-        else if (f1->isDir())
-            return true;
-
         else
-            return false;
+            return f1->isDir();
 
     }
 

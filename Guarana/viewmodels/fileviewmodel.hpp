@@ -19,6 +19,8 @@ private:
 
     QString _readDate;
 
+    bool _isDir;
+
 public:
 
     int getGuaranaFileId() const
@@ -51,6 +53,11 @@ public:
         return _creatDate;
     }
 
+    bool isDir()
+    {
+        return _isDir;
+    }
+
     void setGuaranaFileid(const int guaranaFileId)
     {
         _guaranaFileId = guaranaFileId;
@@ -79,6 +86,11 @@ public:
     void setCreationDate(const QString & creatDate)
     {
         _creatDate = creatDate;
+    }
+
+    void setIsDir(const bool isDir)
+    {
+        _isDir = isDir;
     }
 
 };

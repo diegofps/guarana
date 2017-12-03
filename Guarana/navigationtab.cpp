@@ -1,11 +1,15 @@
 #include "navigationtab.h"
 #include "ui_navigationtab.h"
 
+#include <QDesktopServices>
 #include <QCompleter>
 #include <QMimeData>
 #include <QMenu>
 #include <QMessageBox>
 #include <QDirIterator>
+#include <QInputDialog>
+#include <QClipboard>
+#include <QUrlQuery>
 
 NavigationTab::NavigationTab(Context & context, int id, QWidget *parent) :
     QWidget(parent),
@@ -81,7 +85,7 @@ void NavigationTab::configureTagList()
 void NavigationTab::addFiles(QStringList & filepaths)
 {
     for (auto & filepath : filepaths)
-        _context.getWorkspace().copyFromFS(filepath, _selectedTags.getModel());
+        _context.getWorkspace().importFromFS(filepath, _selectedTags.getModel());
 }
 
 void NavigationTab::updateFiles()
@@ -112,73 +116,70 @@ void NavigationTab::dropEvent(QDropEvent *event)
 {
     const QMimeData *mimeData = event->mimeData();
 
-    if (mimeData->hasUrls())
+    if (!mimeData->hasUrls())
     {
-        qDebug("Mime has urls");
-        QStringList filesList;
-        QList<QUrl> urlList = mimeData->urls();
+        qDebug("Mime doesnt have urls");
+        return;
+    }
 
-        for (int i = 0; i < urlList.size(); ++i)
+    qDebug("Mime has urls");
+    QStringList filesList;
+    QList<QUrl> urlList = mimeData->urls();
+
+    for (QUrl & url : urlList)
+    {
+        if (!url.isLocalFile())
+            continue;
+
+        QString filename = url.toLocalFile();
+        QFileInfo info(filename);
+
+        if (!info.isDir())
         {
-            auto & url = urlList.at(i);
-            if (url.isLocalFile())
+            filesList.append(filename);
+            continue;
+        }
+
+        QMessageBox box;
+        box.setWindowTitle("Add folder");
+        box.setText(filename + " is a local folder.\n\nWould you like to add the folder or its files?");
+        box.addButton("&Cancel", QMessageBox::YesRole);
+        box.addButton("F&iles", QMessageBox::YesRole);
+        box.addButton("&Folder", QMessageBox::YesRole);
+
+        box.exec();
+
+        if (box.clickedButton() == box.buttons().at(1))
+        {
+            qDebug() << "Add files selected";
+            QDirIterator dirIt(filename, QDirIterator::Subdirectories);
+            while(dirIt.hasNext())
             {
-                QString filename = url.toLocalFile();
-                QFileInfo info(filename);
+                QString current = dirIt.next();
+                QFileInfo currentInfo(current);
 
-                if (info.isDir())
-                {
-                    QMessageBox box;
-                    box.setWindowTitle("Add folder");
-                    box.setText(filename + " is a local folder.\n\nWould you like to add the folder or its files?");
-                    box.addButton("&Cancel", QMessageBox::YesRole);
-                    box.addButton("F&iles", QMessageBox::YesRole);
-                    box.addButton("&Folder", QMessageBox::YesRole);
+                if (currentInfo.isSymLink() || currentInfo.isDir())
+                    continue;
 
-                    box.exec();
-
-                    if (box.clickedButton() == box.buttons().at(1))
-                    {
-                        qDebug() << "Add files selected";
-                        QDirIterator dirIt(filename, QDirIterator::Subdirectories);
-                        while(dirIt.hasNext())
-                        {
-                            QString current = dirIt.next();
-                            QFileInfo currentInfo(current);
-
-                            if (currentInfo.isSymLink() || currentInfo.isDir())
-                                continue;
-
-                            qDebug() << "Adding file: " << current;
-                            filesList.append(current);
-                        }
-                    }
-
-                    else if (box.clickedButton() == box.buttons().at(2))
-                    {
-                        qDebug() << "Add folder selected";
-                        filesList.append(filename);
-                    }
-
-                    else
-                    {
-                        qDebug() << "Cancel selected";
-                    }
-                }
-                else
-                {
-                    filesList.append(filename);
-                }
+                qDebug() << "Adding file: " << current;
+                filesList.append(current);
             }
         }
 
-        addFiles(filesList);
-        updateFiles();
+        else if (box.clickedButton() == box.buttons().at(2))
+        {
+            qDebug() << "Add folder selected";
+            filesList.append(filename);
+        }
+
+        else
+        {
+            qDebug() << "Cancel selected";
+        }
     }
-    else
-    {
-        qDebug("Mime doesnt have urls");
-    }
+
+    addFiles(filesList);
+    updateFiles();
 }
 
 void NavigationTab::createActions(QMenu & parentMenu,
@@ -203,7 +204,7 @@ void NavigationTab::createActions(QMenu & parentMenu,
             parentMenu.addAction(action);
             actionsList.append(action);
 
-            Receiver * receiver = new Receiver(file->getPath());
+            Receiver * receiver = new Receiver(this, file->getPath());
             receiversList.append(receiver);
 
             connect(action, &QAction::triggered, receiver, &Receiver::triggered );
@@ -220,6 +221,8 @@ void NavigationTab::showContextMenu(const QPoint & pos)
     QAction copy("Copy", this);
     QAction paste("Paste", this);
     QAction remove("Remove", this);
+    QAction editTags("Tags", this);
+    QAction refresh("Refresh", this);
 
     PtrList<QMenu> menuList;
     PtrList<QAction> actionsList;
@@ -240,6 +243,8 @@ void NavigationTab::showContextMenu(const QPoint & pos)
     connect(&copy, SIGNAL( triggered() ), this, SLOT( copyElements() ));
     connect(&paste, SIGNAL( triggered() ), this, SLOT( pasteElements() ));
     connect(&remove, SIGNAL( triggered() ), this, SLOT( removeElements() ));
+    connect(&editTags, SIGNAL( triggered() ), this, SLOT( editTags() ));
+    connect(&refresh, SIGNAL( triggered() ), this, SLOT( refresh() ));
 
     contextMenu.addMenu(&menuNewFile);
     contextMenu.addMenu(&menuExecActions);
@@ -248,6 +253,9 @@ void NavigationTab::showContextMenu(const QPoint & pos)
     contextMenu.addAction(&copy);
     contextMenu.addAction(&paste);
     contextMenu.addAction(&rename);
+    contextMenu.addSeparator();
+    contextMenu.addAction(&refresh);
+    contextMenu.addAction(&editTags);
     contextMenu.addSeparator();
     contextMenu.addAction(&remove);
 
@@ -315,24 +323,164 @@ void NavigationTab::on_tagsList_doubleClicked(const QModelIndex &index)
     updateFiles();
 }
 
+void NavigationTab::refresh()
+{
+    qDebug() << "Refresh";
+    updateFiles();
+    QClipboard *cboard = QApplication::clipboard();
+    qDebug() << "Current clipboard content:" << cboard->text();
+}
+
 void NavigationTab::renameElements()
 {
     qDebug() << "Rename";
+    QModelIndexList indexes = ui->resultTable->selectionModel()->selectedRows();
+
+    if (indexes.isEmpty())
+    {
+        qDebug() << "No file selected";
+        return;
+    }
+
+    FileViewModel * view = _model.getModel().at(indexes.at(0).row());
+
+    bool ok;
+    QString text = QInputDialog::getText(this, tr("Rename"),
+                                         tr("New name:"), QLineEdit::Normal,
+                                         view->getFilename(), &ok);
+    if (ok && !text.isEmpty())
+    {
+        QList<int> ids;
+        for (auto index : indexes)
+            ids.append(_model.getModel().at(index.row())->getGuaranaFileId());
+        _context.getWorkspace().rename(ids, text);
+    }
+
+    updateFiles();
 }
 
 void NavigationTab::cutElements()
 {
     qDebug() << "Cut";
+    updateClipboardWithSelectedFiles(true);
 }
 
 void NavigationTab::copyElements()
 {
     qDebug() << "Copy";
+    updateClipboardWithSelectedFiles(false);
+}
+
+void NavigationTab::updateClipboardWithSelectedFiles(bool cut)
+{
+    QList<QUrl> urls;
+    GuaranaFile file;
+    Workspace & workspace = _context.getWorkspace();
+
+    QModelIndexList indexes = ui->resultTable->selectionModel()->selectedRows();
+    for (auto & index : indexes)
+    {
+        FileViewModel * view = _model.getModel().at(index.row());
+
+        workspace.getFileById(view->getGuaranaFileId(), file);
+        if (file.getId() == 0)
+            continue;
+
+//        QString filepath = workspace.getFilePath(file);
+//        QUrl url = QUrl::fromLocalFile(filepath);
+
+        QUrlQuery query;
+        query.addQueryItem("id", QString::number(file.getId()));
+        query.addQueryItem("uuid", file.getUuid());
+
+        QUrl t;
+        t.setPath(workspace.getLocation());
+        t.setScheme("guarana");
+        t.setQuery(query);
+
+        urls.append(t);
+    }
+
+    QClipboard *cboard = QApplication::clipboard();
+    QMimeData * mime = new QMimeData();
+
+    mime->setUrls(urls);
+    mime->setText(cut ? "guarana-cut" : "guarana-copy");
+    cboard->setMimeData(mime, QClipboard::Clipboard);
+
+    qDebug() << "Updated clipboard content:" << cboard->text();
 }
 
 void NavigationTab::pasteElements()
 {
     qDebug() << "Paste";
+    QClipboard *clipboard = QApplication::clipboard();
+    const QMimeData *mime = clipboard->mimeData();
+
+    if (!mime->hasUrls())
+    {
+        qDebug() << "Mime has no urls";
+        return;
+    }
+
+    QList<QUrl> urls = mime->urls();
+    QMap<QString, QList<int>*> workspaces;
+    cast(urls, workspaces);
+
+    QMapIterator<QString, QList<int>*> it(workspaces);
+    if (mime->text() == "guarana-cut")
+    {
+        while(it.hasNext())
+        {
+            it.next();
+            _context.getWorkspace().importFromWS(it.key(), *it.value(), _selectedTags.getModel(), true);
+            delete it.value();
+        }
+    }
+    else
+    {
+        while(it.hasNext())
+        {
+            it.next();
+            _context.getWorkspace().importFromWS(it.key(), *it.value(), _selectedTags.getModel(), false);
+            delete it.value();
+        }
+    }
+
+    updateFiles();
+}
+
+void NavigationTab::cast(QList<QUrl> & urls, QMap<QString, QList<int>*> & workspaces)
+{
+    for (QUrl url : urls)
+    {
+        if (url.scheme() != "guarana")
+            continue;
+
+        // We get the info we need to execute the cut (workspace location and id)
+        QUrlQuery query(url);
+        int fileId = query.queryItemValue("id").toInt();
+        QString fileWorkspace = url.path();
+
+        if (!workspaces.contains(fileWorkspace))
+            workspaces[fileWorkspace] = new QList<int>();
+
+        workspaces[fileWorkspace]->append(fileId);
+    }
+}
+
+void NavigationTab::editTags()
+{
+    QModelIndexList rows = ui->resultTable->selectionModel()->selectedRows();
+    qDebug() << "Tags";
+}
+
+void NavigationTab::newFromTemplate(QString & filepath)
+{
+    QStringList filesList;
+    filesList.append(filepath);
+    addFiles(filesList);
+    updateFiles();
 }
 
 void NavigationTab::removeElements()
@@ -348,4 +496,21 @@ void NavigationTab::removeElements()
     }
 
     updateFiles();
+}
+
+void NavigationTab::on_resultTable_doubleClicked(const QModelIndex &index)
+{
+    GuaranaFile gfile;
+    FileViewModel * view = _model.getModel().at(index.row());
+
+    _context.getWorkspace().getFileById(view->getGuaranaFileId(), gfile);
+    if (gfile.getId() == 0)
+    {
+        qDebug() << "File not found";
+        return;
+    }
+
+    QString filepath = _context.getWorkspace().getFilePath(gfile);
+    QUrl url = QUrl::fromLocalFile(filepath);
+    QDesktopServices::openUrl(url);
 }

@@ -4,6 +4,10 @@
 #include <QList>
 #include <QString>
 #include <QFileInfo>
+#include <QClipboard>
+#include <QApplication>
+#include <QMimeData>
+#include <QUrlQuery>
 
 #include <helpers/ptrlist.hpp>
 
@@ -32,7 +36,7 @@ public:
 
     }
 
-    void setWorkspaceLocation(QString path)
+    void setWorkspaceLocation(QString path, bool skipExtraFolders=false)
     {
         _workspace = path;
 
@@ -41,9 +45,12 @@ public:
 
         _db = new DBManager(_workspace + "/guarana.db");
 
-        QDir tmp;
-        tmp.mkpath(getWorkspaceTemplatesDir());
-        tmp.mkpath(getWorkspaceActionsDir());
+        if (!skipExtraFolders)
+        {
+            QDir tmp;
+            tmp.mkpath(getWorkspaceTemplatesDir());
+            tmp.mkpath(getWorkspaceActionsDir());
+        }
     }
 
     QString getWorkspaceActionsDir() const
@@ -73,19 +80,107 @@ public:
         manager.update(file);
     }
 
-    void copyFromFS(QString filepath, PtrList<Tag> & tags)
+    void rename(QList<int> ids, QString & newName)
+    {
+        GuaranaFileManager & manager = _db->getGuaranaFileManager();
+        GuaranaFile file;
+        QDir dir;
+
+        for (int id : ids)
+        {
+            manager.getById(id, file);
+
+            if (file.getId() == 0 || newName == file.getFilename())
+                continue;
+
+            QString location = getFileLocation(file);
+            QString oldFilepath = location + "/" + file.getFilename();
+            QString newFilepath = location + "/" + newName;
+
+            if (dir.rename(oldFilepath, newFilepath))
+            {
+                file.setFilename(newName);
+                manager.update(file);
+            }
+            else
+            {
+                qDebug() << "Could not rename: " << getFilePath(file);
+            }
+        }
+    }
+
+    void getFileById(int id, GuaranaFile & gfile)
+    {
+        _db->getGuaranaFileManager().getById(id, gfile);
+    }
+
+    void importFromWS(const QString & oldWorkspace, const QList<int> & oldIds, const PtrList<Tag> & newTags, const bool moveFiles=false)
+    {
+        QString newWorkspace = _workspace;
+        QStringList srcFilepaths;
+        QStringList srcFolders;
+        GuaranaFile oldFile;
+        QList<int> validIds;
+
+        // We access the original workspace to see if the files exist and get their paths
+        setWorkspaceLocation(oldWorkspace, true);
+        for (int oldId : oldIds)
+        {
+            _db->getGuaranaFileManager().getById(oldId, oldFile);
+            // If it doesn't exists we ignore the file
+            if (oldFile.getId() == 0)
+            {
+                qDebug() << "Could not locate src file with id: " << oldId;
+                continue;
+            }
+
+            validIds.append(oldId);
+            srcFilepaths.append(getFilePath(oldFile));
+            srcFolders.append(getFileLocation(oldFile));
+        }
+
+        // We come back to the new workspace and perform the moves
+        setWorkspaceLocation(newWorkspace, true);
+        for (QString & oldFilepath : srcFilepaths)
+            importFromFS(oldFilepath, newTags, moveFiles);
+
+        // If this is a move then we go to the old workspace to permanently
+        // delete the files and then return to our workspace.
+        if (moveFiles)
+        {
+            setWorkspaceLocation(oldWorkspace, true);
+            _db->getGuaranaFileManager().destroyAll(validIds);
+            setWorkspaceLocation(newWorkspace, true);
+
+            // Remove the uuid folders
+            for (QString srcFolder : srcFolders)
+                QDir(srcFolder).removeRecursively();
+        }
+    }
+
+    void importFromFS(const QString & filepath, const PtrList<Tag> & tags, const bool moveFile=false)
     {
         QFileInfo fi(filepath);
-        GuaranaFile gfile(fi.fileName(), RandomHelper::createGuid());
+        QString filename = fi.fileName();
+
+        GuaranaFile gfile(
+                    filename.startsWith("_") ? filename.mid(1, filename.length()) : filename,
+                    RandomHelper::createGuid());
 
         QString innerFileLocation = getFileLocation(gfile);
         QString innerFilePath = getFilePath(gfile);
 
-        QDir().mkpath(innerFileLocation);
-        if (fi.isDir())
-            IOUtils::copyDir(filepath, innerFilePath);
+        QDir dir;
+        dir.mkpath(innerFileLocation);
+        if (moveFile)
+            dir.rename(filepath, innerFilePath);
         else
-            QFile::copy(filepath, innerFilePath);
+        {
+            if (fi.isDir())
+                IOUtils::copyDir(filepath, innerFilePath);
+            else
+                QFile::copy(filepath, innerFilePath);
+        }
 
         TagManager & tm = _db->getTagManager();
         GuaranaFileManager & gfm = _db->getGuaranaFileManager();
@@ -130,6 +225,12 @@ public:
 
         // Cast the files to the corresponding viewmodel
         Merlin::castList(gfiles, result, _workspace);
+        std::sort(result.begin(), result.end(), [](FileViewModel * p1, FileViewModel * p2) {
+            if ( p1->isDir() == p2->isDir())
+                return p1->getFilename() < p2->getFilename();
+            else
+                return p1->isDir();
+        });
     }
 
     QString getFileLocation(GuaranaFile & gfile) const
@@ -147,7 +248,7 @@ public:
         return *_db;
     }
 
-    QString getRootLocation()
+    QString getLocation()
     {
         return _workspace;
     }

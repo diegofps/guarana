@@ -16,6 +16,12 @@ namespace Ui {
 class NavigationTab;
 }
 
+class ReceiverListener
+{
+public:
+    virtual void newFromTemplate(QString & filepath) = 0;
+};
+
 class Receiver : public QObject
 {
 
@@ -23,11 +29,14 @@ class Receiver : public QObject
 
 private:
 
+    ReceiverListener * _listener;
+
     QString & _filepath;
 
 public:
 
-    Receiver(QString & filepath) :
+    Receiver(ReceiverListener * listener, QString & filepath) :
+        _listener(listener),
         _filepath(filepath)
     {
 
@@ -37,12 +46,12 @@ public slots:
 
     void triggered()
     {
-        qDebug() << _filepath;
+        _listener->newFromTemplate(_filepath);
     }
 
 };
 
-class NavigationTab : public QWidget, WorkspaceReadyListener
+class NavigationTab : public QWidget, WorkspaceReadyListener, ReceiverListener
 {
     Q_OBJECT
 
@@ -65,6 +74,10 @@ private:
     void createActions(QMenu &parentMenu, FileMap &file, PtrList<QAction> & actionsList, PtrList<QMenu> & menuList,
                        PtrList<Receiver> & receiversList);
 
+    void updateClipboardWithSelectedFiles(bool cut);
+
+    void cast(QList<QUrl> & urls, QMap<QString, QList<int>*> & workspaces);
+
 protected:
 
     void dragEnterEvent(QDragEnterEvent *event) override;
@@ -78,6 +91,8 @@ public:
     ~NavigationTab();
 
     void onWorkspaceReady() override;
+
+    virtual void newFromTemplate(QString &filepath);
 
 private slots:
 
@@ -93,6 +108,10 @@ private slots:
 
     void on_tagsList_doubleClicked(const QModelIndex &index);
 
+    void refresh();
+
+    void editTags();
+
     void renameElements();
 
     void cutElements();
@@ -102,6 +121,8 @@ private slots:
     void pasteElements();
 
     void removeElements();
+
+    void on_resultTable_doubleClicked(const QModelIndex &index);
 
 private:
 

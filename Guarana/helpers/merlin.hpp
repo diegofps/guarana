@@ -28,6 +28,7 @@ public:
         model.setCreationDate(dateCreated);
         model.setModificationDate(lastModification);
         model.setReadingDate(lastRead);
+        model.setIsDir(fi.isDir());
 
         return model;
     }

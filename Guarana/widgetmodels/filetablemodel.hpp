@@ -2,9 +2,7 @@
 #define FILETABLEMODEL_HPP
 
 #include <QAbstractTableModel>
-
 #include <helpers/ptrlist.hpp>
-
 #include <viewmodels/fileviewmodel.hpp>
 
 class FileTableModel : public QAbstractTableModel

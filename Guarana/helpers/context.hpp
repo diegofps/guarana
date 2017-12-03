@@ -63,11 +63,11 @@ public:
         _templates.clear();
         _actions.clear();
 
-        _actions.addFolder(_configManager.getGlobalActionsDir());
-        _actions.addFolder(_workspace.getWorkspaceActionsDir());
+        _actions.addFolder(_configManager.getGlobalActionsDir(), false);
+        _actions.addFolder(_workspace.getWorkspaceActionsDir(), false);
 
-        _templates.addFolder(_configManager.getGlobalTemplatesDir());
-        _templates.addFolder(_workspace.getWorkspaceTemplatesDir());
+        _templates.addFolder(_configManager.getGlobalTemplatesDir(), true);
+        _templates.addFolder(_workspace.getWorkspaceTemplatesDir(), true);
     }
 
 };
