@@ -56,16 +56,21 @@ public:
         return _workspace + "/new";
     }
 
-    void remove(GuaranaFile & file)
+    void remove(int fileId)
     {
+        auto & manager = _db->getGuaranaFileManager();
+
+        GuaranaFile file;
+        manager.getById(fileId, file);
+
         if (file.getId() == 0)
             return;
 
-        auto date = QDateTime::currentDateTime();
-        file.setRemovedDate(date);
-        file.isRemoved(true);
+        //auto date = QDateTime::currentDateTime();
+        file.setRemovedDate(QDateTime::currentDateTime());
+        file.setIsAlive(false);
 
-        _db->getGuaranaFileManager().update(file);
+        manager.update(file);
     }
 
     void copyFromFS(QString filepath, PtrList<Tag> & tags)
@@ -103,7 +108,7 @@ public:
         }
     }
 
-    void filter(PtrList<Tag> & tagsFilter, QString textFilter, PtrList<FileViewModel> & result)
+    void filter(PtrList<Tag> & tagsFilter, QString textFilter, PtrList<FileViewModel> & result, bool isAlive)
     {
         // Check the tags received
         for (Tag * tag : tagsFilter)
@@ -121,7 +126,7 @@ public:
 
         // Get the files for the given tags
         PtrList<GuaranaFile> gfiles;
-        _db->getGuaranaFileManager().filter(tagsFilter, textFilter, gfiles);
+        _db->getGuaranaFileManager().filter(tagsFilter, textFilter, gfiles, isAlive);
 
         // Cast the files to the corresponding viewmodel
         Merlin::castList(gfiles, result, _workspace);

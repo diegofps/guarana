@@ -95,7 +95,7 @@ public:
             _files->append(child);
         }
 
-        qSort(_files->begin(), _files->end(), cmpFilesLessThan);
+        std::sort(_files->begin(), _files->end(), cmpFilesLessThan);
     }
 
     static bool cmpFilesLessThan(FileMap *& f1, FileMap *& f2)

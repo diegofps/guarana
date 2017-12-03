@@ -21,7 +21,11 @@ public:
     ~TagsForm();
 
 private:
+
     Ui::TagsForm *ui;
+
+    Context & _context;
+
 };
 
 #endif // TAGSFORM_H

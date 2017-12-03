@@ -89,7 +89,8 @@ void NavigationTab::updateFiles()
     _context.getWorkspace().filter(
                 _selectedTags.getModel(),
                 ui->textFilter->text(),
-                _model.getModel());
+                _model.getModel(),
+                true);
     _model.refresh();
 }
 
@@ -342,7 +343,7 @@ void NavigationTab::removeElements()
     for (auto index : indexes)
     {
         FileViewModel * ptr = _model.getModel().at(index.row());
-        _context.getWorkspace().remove(ptr);
+        _context.getWorkspace().remove(ptr->getGuaranaFileId());
         qDebug() << index.row() << ", " << index.column() << ": " << ptr->getFilename();
     }
 

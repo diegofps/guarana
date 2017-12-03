@@ -3,7 +3,8 @@
 
 HistoryForm::HistoryForm(Context & context, QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::HistoryForm)
+    ui(new Ui::HistoryForm),
+    _context(context)
 {
     ui->setupUi(this);
 }

@@ -40,11 +40,6 @@ MainWindow::~MainWindow()
     delete _settingsForm;
 }
 
-void MainWindow::configureFor(QString & dataFolder)
-{
-
-}
-
 void MainWindow::onPageEnded()
 {
     close();

@@ -3,7 +3,8 @@
 
 TagsForm::TagsForm(Context & context, QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::TagsForm)
+    ui(new Ui::TagsForm),
+    _context(context)
 {
     ui->setupUi(this);
 }

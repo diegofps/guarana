@@ -31,8 +31,6 @@ public:
 
     ~MainWindow();
 
-    void configureFor(QString & dataFolder);
-
     virtual void onPageEnded();
 
 private slots:

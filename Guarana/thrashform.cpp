@@ -3,7 +3,8 @@
 
 ThrashForm::ThrashForm(Context & context, QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::ThrashForm)
+    ui(new Ui::ThrashForm),
+    _context(context)
 {
     ui->setupUi(this);
 }

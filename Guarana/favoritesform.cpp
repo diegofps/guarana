@@ -3,7 +3,8 @@
 
 FavoritesForm::FavoritesForm(Context & context, QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::FavoritesForm)
+    ui(new Ui::FavoritesForm),
+    _context(context)
 {
     ui->setupUi(this);
 }

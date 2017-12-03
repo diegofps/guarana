@@ -1,8 +1,9 @@
 #ifndef GUARANAFILE_HPP
 #define GUARANAFILE_HPP
 
-#include "QString"
-#include "QUuid"
+#include <QDateTime>
+#include <QString>
+#include <QUuid>
 
 class GuaranaFile
 {
@@ -15,6 +16,8 @@ private:
     QString _uuid;
 
     bool _isAlive;
+
+    QDateTime _removedDate;
 
 public:
 
@@ -52,6 +55,11 @@ public:
         return _isAlive;
     }
 
+    QDateTime getRemovedDate() const
+    {
+        return _removedDate;
+    }
+
     void setId(const int id)
     {
         _id = id;
@@ -70,6 +78,11 @@ public:
     void setIsAlive(const bool isAlive)
     {
         _isAlive = isAlive;
+    }
+
+    void setRemovedDate(const QDateTime & date)
+    {
+        _removedDate = date;
     }
 
 };

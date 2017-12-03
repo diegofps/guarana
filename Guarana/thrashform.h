@@ -11,6 +11,7 @@ class ThrashForm;
 
 class ThrashForm : public QWidget
 {
+
     Q_OBJECT
 
 public:
@@ -20,7 +21,11 @@ public:
     ~ThrashForm();
 
 private:
+
     Ui::ThrashForm *ui;
+
+    Context & _context;
+
 };
 
 #endif // THRASHFORM_H

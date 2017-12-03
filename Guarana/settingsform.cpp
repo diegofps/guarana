@@ -3,7 +3,8 @@
 
 SettingsForm::SettingsForm(Context & context, QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::SettingsForm)
+    ui(new Ui::SettingsForm),
+    _context(context)
 {
     ui->setupUi(this);
 }

@@ -21,7 +21,11 @@ public:
     ~SettingsForm();
 
 private:
+
     Ui::SettingsForm *ui;
+
+    Context & _context;
+
 };
 
 #endif // SETTINGSFORM_H

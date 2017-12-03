@@ -107,15 +107,15 @@ private:
 
     Ui::NavigationTab *ui;
 
-    const int _id;
-
     FileTableModel _model;
-
-    Context & _context;
 
     TagListModel _selectedTags;
 
     TagListModel _tagOptions;
+
+    Context & _context;
+
+    const int _id;
 
     QCompleter _tagCompleter;
 

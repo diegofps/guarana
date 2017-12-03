@@ -22,7 +22,7 @@ public:
     {
         QSqlQuery query;
         query.prepare("SELECT id, name FROM Tags WHERE name=:name LIMIT 1");
-        query.bindValue(":name", tag.getName());
+        query.bindValue(":name", name);
         exec(query);
 
         if (query.next())

@@ -56,10 +56,10 @@ public:
         //exec("CREATE TABLE IF NOT EXISTS People(id INTEGER PRIMARY KEY, name TEXT)");
 
         exec("CREATE TABLE IF NOT EXISTS Tags(id INTEGER PRIMARY KEY, name TEXT)");
-        exec("CREATE TABLE IF NOT EXISTS GuaranaFiles(id INTEGER PRIMARY KEY, filename TEXT, uuid TEXT)");
+        exec("CREATE TABLE IF NOT EXISTS GuaranaFiles(id INTEGER PRIMARY KEY, filename TEXT, uuid TEXT, isAlive INTEGER, removedDate INTEGER)");
+        exec("CREATE TABLE IF NOT EXISTS _GuaranaFile_Tag(id INTEGER PRIMARY KEY, guaranaFileId INTEGER, tagId INTEGER)");
 
         exec("CREATE TABLE IF NOT EXISTS __Migrations__(id INTEGER PRIMARY KEY, timestamp INTEGER)");
-        exec("CREATE TABLE IF NOT EXISTS _GuaranaFile_Tag(id INTEGER PRIMARY KEY, guaranaFileId INTEGER, tagId INTEGER)");
     }
 
     void applyPendingMigrations()
