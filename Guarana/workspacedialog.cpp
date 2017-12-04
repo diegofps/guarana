@@ -12,16 +12,12 @@ WorkspaceDialog::WorkspaceDialog(Context & context, QWidget *parent) :
     _mainWindow(nullptr)
 {
     ui->setupUi(this);
+    ui->cbDataFolders->addItems(_context.getConfigManager().getWorkspaceLocations());
 
     if (_context.getConfigManager().hasLastWorkspaceLocation())
-    {
-        showMainWindow();
-    }
+        showMainWindow(_context.getConfigManager().getLastWorkspaceLocation());
     else
-    {
         show();
-        ui->cbDataFolders->addItems(_context.getConfigManager().getWorkspaceLocations());
-    }
 }
 
 WorkspaceDialog::~WorkspaceDialog()
@@ -29,6 +25,11 @@ WorkspaceDialog::~WorkspaceDialog()
     delete ui;
     if (_mainWindow != nullptr)
         delete _mainWindow;
+}
+
+void WorkspaceDialog::onChangeWorkspace()
+{
+    show();
 }
 
 void WorkspaceDialog::on_btBrowse_clicked()
@@ -60,12 +61,15 @@ bool WorkspaceDialog::selectItem(QString & dir)
     return false;
 }
 
-void WorkspaceDialog::showMainWindow()
+void WorkspaceDialog::showMainWindow(QString workspaceLocation)
 {
     hide();
-    QString path = _context.getConfigManager().getLastWorkspaceLocation();
-    _context.openWorkspace(path);
-    _mainWindow = new MainWindow(_context);
+    _context.openWorkspace(workspaceLocation);
+
+    if (_mainWindow != nullptr)
+        delete _mainWindow;
+
+    _mainWindow = new MainWindow(this, _context);
     _mainWindow->show();
 }
 
@@ -79,10 +83,10 @@ void WorkspaceDialog::on_btAccept_clicked()
         _context.getConfigManager().setLastWorkspaceLocation(dir);
         _context.getConfigManager().saveSettings();
 
-        showMainWindow();
+        showMainWindow(dir);
     }
     else
     {
-        ui->msgLabel->setText("Could not access this folder");
+        ui->msgLabel->setText("Could not access the workspace");
     }
 }

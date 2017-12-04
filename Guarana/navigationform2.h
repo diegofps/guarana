@@ -20,6 +20,7 @@ private:
 
 public:
     explicit NavigationForm2(Context & context, QWidget *parent = 0);
+
     ~NavigationForm2();
 
     void init(Context context);

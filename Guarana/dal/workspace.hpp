@@ -38,6 +38,9 @@ public:
 
     void setWorkspaceLocation(QString path, bool skipExtraFolders=false)
     {
+        if (path == _workspace)
+            return;
+
         _workspace = path;
 
         if (_db != nullptr)

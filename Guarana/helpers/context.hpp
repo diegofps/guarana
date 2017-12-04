@@ -59,6 +59,7 @@ public:
     void openWorkspace(QString path)
     {
         _configManager.setLastWorkspaceLocation(path);
+        _configManager.saveSettings();
         _workspace.setWorkspaceLocation(path);
         _templates.clear();
         _actions.clear();

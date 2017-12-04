@@ -16,6 +16,12 @@ namespace Ui {
 class MainWindow;
 }
 
+class MainWindowListener
+{
+public:
+    virtual void onChangeWorkspace() = 0;
+};
+
 class MainWindow : public QMainWindow, PagesEndedListener
 {
 
@@ -27,11 +33,12 @@ private:
 
 public:
 
-    explicit MainWindow(Context & context, QWidget *parent = 0);
+    explicit MainWindow(MainWindowListener * listener, Context & context, QWidget *parent = 0);
 
     ~MainWindow();
 
     virtual void onPageEnded();
+
 
 private slots:
 
@@ -46,6 +53,10 @@ private slots:
     void on_btThrash_clicked();
 
     void on_btSettings_clicked();
+
+    void on_actionSwitch_workspace_triggered();
+
+    void on_actionQuit_triggered();
 
 private:
 
@@ -64,6 +75,8 @@ private:
     ThrashForm * _thrashForm;
 
     SettingsForm * _settingsForm;
+
+    MainWindowListener * _listener;
 
 };
 

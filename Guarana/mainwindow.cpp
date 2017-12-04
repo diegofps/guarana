@@ -1,10 +1,11 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-MainWindow::MainWindow(Context & context, QWidget *parent) :
+MainWindow::MainWindow(MainWindowListener * listener, Context & context, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    _context(context)
+    _context(context),
+    _listener(listener)
 {
     ui->setupUi(this);
 
@@ -26,7 +27,8 @@ MainWindow::MainWindow(Context & context, QWidget *parent) :
     setWindowTitle("Guarana - " + context.getWorkspace().getLocation());
 
     context.getLocalBroadcast().registerPageEndedListener(this);
-    context.getLocalBroadcast().sendWorkspaceReady();
+    //context.getLocalBroadcast().sendWorkspaceReady();
+    //context.getLocalBroadcast().registerListener();
 }
 
 MainWindow::~MainWindow()
@@ -87,4 +89,15 @@ void MainWindow::checkButton(int index, QPushButton * bt)
     ui->btSettings->setChecked(false);
 
     bt->setChecked(true);
+}
+
+void MainWindow::on_actionSwitch_workspace_triggered()
+{
+    close();
+    _listener->onChangeWorkspace();
+}
+
+void MainWindow::on_actionQuit_triggered()
+{
+    close();
 }

@@ -51,7 +51,7 @@ public slots:
 
 };
 
-class NavigationTab : public QWidget, WorkspaceReadyListener, ReceiverListener
+class NavigationTab : public QWidget, ReceiverListener
 {
     Q_OBJECT
 
@@ -89,8 +89,6 @@ public:
     explicit NavigationTab(Context & context, int id, QWidget *parent = 0);
 
     ~NavigationTab();
-
-    void onWorkspaceReady() override;
 
     virtual void newFromTemplate(QString &filepath);
 

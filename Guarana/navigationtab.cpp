@@ -26,19 +26,15 @@ NavigationTab::NavigationTab(Context & context, int id, QWidget *parent) :
     configureTagList();
     configureResultTable();
 
-    _context.getLocalBroadcast().registerWorkspaceReadyListener(this);
     _context.getWorkspace().getDB().getTagManager().getAll(_tagOptions.getModel());
     _tagOptions.refresh();
+
+    updateFiles();
 }
 
 NavigationTab::~NavigationTab()
 {
     delete ui;
-}
-
-void NavigationTab::onWorkspaceReady()
-{
-    updateFiles();
 }
 
 void NavigationTab::configureResultTable()

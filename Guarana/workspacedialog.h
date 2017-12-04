@@ -10,13 +10,16 @@ namespace Ui {
 class WorkspaceDialog;
 }
 
-class WorkspaceDialog : public QDialog
+class WorkspaceDialog : public QDialog, MainWindowListener
 {
     Q_OBJECT
 
 public:
     explicit WorkspaceDialog(Context & context, QWidget *parent = 0);
+
     ~WorkspaceDialog();
+
+    virtual void onChangeWorkspace();
 
 private slots:
 
@@ -36,7 +39,7 @@ private:
 
     bool selectItem(QString & dir);
 
-    void showMainWindow();
+    void showMainWindow(QString workspaceLocation);
 
 };
 
