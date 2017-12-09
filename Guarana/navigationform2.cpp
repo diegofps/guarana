@@ -4,18 +4,24 @@
 NavigationForm2::NavigationForm2(Context & context, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::NavigationForm2),
+    _tabs(true),
     _context(context),
     _id(0)
 {
     ui->setupUi(this);
+    ui->cbPages->setModel(&_tabs);
+
     createTab();
 }
 
 NavigationForm2::~NavigationForm2()
 {
     delete ui;
-    for (NavigationTab *page : _navigationPages)
-        delete page;
+}
+
+void NavigationForm2::onTitleChanged(NavigationTab * tab, QString &newTitle)
+{
+    _tabs.refresh();
 }
 
 void NavigationForm2::on_btNewPage_clicked()
@@ -26,15 +32,14 @@ void NavigationForm2::on_btNewPage_clicked()
 void NavigationForm2::on_btClosePage_clicked()
 {
     int index = ui->cbPages->currentIndex();
-    NavigationTab *page = _navigationPages[index];
+    NavigationTab *page = _tabs[index];
 
-    ui->cbPages->removeItem(index);
     ui->stackedPages->removeWidget(page);
-    _navigationPages.removeAt(index);
+    _tabs.removeAt(index);
 
     delete page;
 
-    if (_navigationPages.size() == 0)
+    if (_tabs.size() == 0)
         _context.getLocalBroadcast().sendPagesEnded();
 }
 
@@ -46,11 +51,12 @@ void NavigationForm2::on_cbPages_activated(int index)
 void NavigationForm2::createTab()
 {
     ++_id;
-    NavigationTab *tab = new NavigationTab(_context, _id);
-    _navigationPages.append(tab);
+    NavigationTab *tab = new NavigationTab(_context, this, _id);
+    _tabs.append(tab);
 
-    int index = _navigationPages.count() - 1;
+    int index = _tabs.count() - 1;
 
+    _tabs.refresh();
     ui->stackedPages->addWidget(tab);
     ui->stackedPages->setCurrentIndex(index);
     ui->cbPages->addItem("Unnamed tab " + QString::number(_id));

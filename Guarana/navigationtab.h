@@ -7,7 +7,7 @@
 #include <QMenu>
 
 #include <widgetmodels/filetablemodel.hpp>
-#include <widgetmodels/taglistmodel.hpp>
+#include <widgetmodels/ptrlistmodel.hpp>
 
 #include "helpers/context.hpp"
 
@@ -51,6 +51,16 @@ public slots:
 
 };
 
+class NavigationTab;
+
+class NavigationTabListener
+{
+public:
+
+    virtual void onTitleChanged(NavigationTab * tab, QString & newTitle) = 0;
+
+};
+
 class NavigationTab : public QWidget, ReceiverListener
 {
     Q_OBJECT
@@ -65,9 +75,13 @@ private:
 
     void addFiles(QStringList & filepaths);
 
+    void addFileAs(QString &filepath, QString &newName);
+
     void addFolders(QStringList & folderpaths);
 
     void updateFiles();
+
+    void updateTitle();
 
     void updateTagOptions();
 
@@ -84,13 +98,17 @@ protected:
 
     void dropEvent(QDropEvent *ev) override;
 
+    void setTitle(QString &str);
+
 public:
 
-    explicit NavigationTab(Context & context, int id, QWidget *parent = 0);
+    explicit NavigationTab(Context & context, NavigationTabListener * listener, int id, QWidget *parent = 0);
 
     ~NavigationTab();
 
     virtual void newFromTemplate(QString &filepath);
+
+    QString getTitle() const;
 
 private slots:
 
@@ -128,15 +146,19 @@ private:
 
     FileTableModel _model;
 
-    TagListModel _selectedTags;
+    PtrListModel<Tag, &Tag::getName> _selectedTags;
 
-    TagListModel _tagOptions;
+    PtrListModel<Tag, &Tag::getName> _tagOptions;
 
     Context & _context;
 
     const int _id;
 
     QCompleter _tagCompleter;
+
+    NavigationTabListener * _listener;
+
+    QString _title;
 
 };
 

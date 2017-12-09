@@ -10,8 +10,9 @@ namespace Ui {
 class NavigationForm2;
 }
 
-class NavigationForm2 : public QWidget
+class NavigationForm2 : public QWidget, NavigationTabListener
 {
+
     Q_OBJECT
 
 private:
@@ -19,13 +20,17 @@ private:
     void createTab();
 
 public:
+
     explicit NavigationForm2(Context & context, QWidget *parent = 0);
 
     ~NavigationForm2();
 
     void init(Context context);
 
+    virtual void onTitleChanged(NavigationTab * tab, QString & newTitle);
+
 private slots:
+
     void on_btNewPage_clicked();
 
     void on_btClosePage_clicked();
@@ -33,9 +38,10 @@ private slots:
     void on_cbPages_activated(int index);
 
 private:
-    Ui::NavigationForm2 *ui;
 
-    QList<NavigationTab*> _navigationPages;
+    Ui::NavigationForm2 * ui;
+
+    PtrListModel<NavigationTab, &NavigationTab::getTitle> _tabs;
 
     Context & _context;
 

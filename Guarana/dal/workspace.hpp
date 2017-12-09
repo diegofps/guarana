@@ -161,35 +161,34 @@ public:
         }
     }
 
-    void importFromFS(const QString & filepath, const PtrList<Tag> & tags, const bool moveFile=false)
+    void importFromFS(const QString & filepath,
+                      const PtrList<Tag> & tags,
+                      const QString & newName,
+                      const bool moveFile=false)
     {
         QFileInfo fi(filepath);
-        QString filename = fi.fileName();
-
-        GuaranaFile gfile(
-                    filename.startsWith("_") ? filename.mid(1, filename.length()) : filename,
-                    RandomHelper::createGuid());
-
+        GuaranaFile gfile(newName, RandomHelper::createGuid());
         QString innerFileLocation = getFileLocation(gfile);
         QString innerFilePath = getFilePath(gfile);
-
         QDir dir;
+
         dir.mkpath(innerFileLocation);
+
         if (moveFile)
             dir.rename(filepath, innerFilePath);
+
+        else if (fi.isDir())
+            IOUtils::copyDir(filepath, innerFilePath);
+
         else
-        {
-            if (fi.isDir())
-                IOUtils::copyDir(filepath, innerFilePath);
-            else
-                QFile::copy(filepath, innerFilePath);
-        }
+            QFile::copy(filepath, innerFilePath);
 
         TagManager & tm = _db->getTagManager();
         GuaranaFileManager & gfm = _db->getGuaranaFileManager();
         _GuaranaFile_Tag_Manager & guaranafile_tag_manager = _db->get_GuaranaFile_Tag_Manager();
 
         qDebug() << "Importing file: " << gfile.getFilename();
+
         gfm.save(gfile);
         for (Tag * tag : tags)
         {
@@ -206,20 +205,32 @@ public:
         }
     }
 
+    void importFromFS(const QString & filepath, const PtrList<Tag> & tags, const bool moveFile=false)
+    {
+        QFileInfo fi(filepath);
+        QString filename = fi.fileName();
+
+        if (filename.startsWith("_"))
+            importFromFS(filepath, tags, filename.mid(1, filename.length()), moveFile);
+        else
+            importFromFS(filepath, tags, filename, moveFile);
+    }
+
     void filter(PtrList<Tag> & tagsFilter, QString textFilter, PtrList<FileViewModel> & result, bool isAlive)
     {
         // Check the tags received
         for (Tag * tag : tagsFilter)
         {
-            if (tag->getId() == 0)
-            {
-                _db->getTagManager().getByName(tag->getName(), *tag);
-                if (tag->getId() == 0)
-                {
-                    result.clear();
-                    return;
-                }
-            }
+            if (tag->getId() != 0)
+                continue;
+
+            _db->getTagManager().getByName(tag->getName(), *tag);
+
+            if (tag->getId() != 0)
+                continue;
+
+            result.clear();
+            return;
         }
 
         // Get the files for the given tags

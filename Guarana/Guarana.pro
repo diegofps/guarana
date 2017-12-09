@@ -70,8 +70,8 @@ HEADERS += \
     helpers/ptrlist.hpp \
     widgetmodels/filetablemodel.hpp \
     helpers/randomhelper.hpp \
-    widgetmodels/taglistmodel.hpp \
-    helpers/filemap.hpp
+    helpers/filemap.hpp \
+    widgetmodels/ptrlistmodel.hpp
 
 FORMS += \
     mainwindow.ui \

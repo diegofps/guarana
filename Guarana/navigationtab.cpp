@@ -11,12 +11,15 @@
 #include <QClipboard>
 #include <QUrlQuery>
 
-NavigationTab::NavigationTab(Context & context, int id, QWidget *parent) :
+NavigationTab::NavigationTab(Context & context, NavigationTabListener * listener, int id, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::NavigationTab),
+    _selectedTags(&Tag::getName),
+    _tagOptions(&Tag::getName),
     _context(context),
     _id(id),
-    _tagCompleter(&_tagOptions)
+    _tagCompleter(&_tagOptions),
+    _listener(listener)
 {
     ui->setupUi(this);
 
@@ -26,10 +29,11 @@ NavigationTab::NavigationTab(Context & context, int id, QWidget *parent) :
     configureTagList();
     configureResultTable();
 
-    _context.getWorkspace().getDB().getTagManager().getAll(_tagOptions.getModel());
+    _context.getWorkspace().getDB().getTagManager().getAll(_tagOptions);
     _tagOptions.refresh();
 
     updateFiles();
+    updateTitle();
 }
 
 NavigationTab::~NavigationTab()
@@ -81,17 +85,46 @@ void NavigationTab::configureTagList()
 void NavigationTab::addFiles(QStringList & filepaths)
 {
     for (auto & filepath : filepaths)
-        _context.getWorkspace().importFromFS(filepath, _selectedTags.getModel());
+        _context.getWorkspace().importFromFS(filepath, _selectedTags);
+}
+
+void NavigationTab::addFileAs(QString & filepath, QString & newName)
+{
+    _context.getWorkspace().importFromFS(filepath, _selectedTags, newName, false);
 }
 
 void NavigationTab::updateFiles()
 {
     _context.getWorkspace().filter(
-                _selectedTags.getModel(),
+                _selectedTags,
                 ui->textFilter->text(),
                 _model.getModel(),
                 true);
     _model.refresh();
+}
+
+void NavigationTab::updateTitle()
+{
+    QString textFilter = ui->textFilter->text().trimmed();
+    QStringList tagNames;
+    QString newTitle;
+
+    for (auto & tag : _selectedTags)
+        tagNames.append(tag->getName());
+
+    if (tagNames.isEmpty() && textFilter.isEmpty())
+        newTitle = "<No filter>";
+
+    else if (tagNames.isEmpty())
+        newTitle = textFilter;
+
+    else if (textFilter.isEmpty())
+        newTitle = tagNames.join(" / ");
+
+    else
+        newTitle = tagNames.join(" / ") + " : " + textFilter;
+
+    setTitle(newTitle);
 }
 
 //void NavigationTab::updateTagOptions()
@@ -176,6 +209,13 @@ void NavigationTab::dropEvent(QDropEvent *event)
 
     addFiles(filesList);
     updateFiles();
+}
+
+void NavigationTab::setTitle(QString &title)
+{
+    _title = title;
+    if (_listener != nullptr)
+        _listener->onTitleChanged(this, title);
 }
 
 void NavigationTab::createActions(QMenu & parentMenu,
@@ -280,16 +320,17 @@ void NavigationTab::showContextMenu(const QPoint & pos)
 void NavigationTab::on_tagFilter_returnPressed()
 {
     QString tagName = ui->tagFilter->text();
-    Tag * tag = _tagOptions.getOrDefault(tagName);
+    Tag * tag = _tagOptions.getOrNull(tagName);
 
     if (tag == nullptr)
         tag = new Tag(tagName);
 
     if (!_selectedTags.contains(tagName))
     {
-        _selectedTags.getModel().append(tag);
+        _selectedTags.append(tag);
         _selectedTags.refresh();
         updateFiles();
+        updateTitle();
     }
 
     ui->tagFilter->clear();
@@ -310,13 +351,15 @@ void NavigationTab::on_btClearTextFilter_clicked()
 void NavigationTab::on_textFilter_returnPressed()
 {
     updateFiles();
+    updateTitle();
 }
 
 void NavigationTab::on_tagsList_doubleClicked(const QModelIndex &index)
 {
-    _selectedTags.getModel().removeAt(index.row());
+    _selectedTags.removeAt(index.row());
     _selectedTags.refresh();
     updateFiles();
+    updateTitle();
 }
 
 void NavigationTab::refresh()
@@ -340,17 +383,17 @@ void NavigationTab::renameElements()
 
     FileViewModel * view = _model.getModel().at(indexes.at(0).row());
 
-    bool ok;
-    QString text = QInputDialog::getText(this, tr("Rename"),
-                                         tr("New name:"), QLineEdit::Normal,
-                                         view->getFilename(), &ok);
-    if (ok && !text.isEmpty())
-    {
-        QList<int> ids;
-        for (auto index : indexes)
-            ids.append(_model.getModel().at(index.row())->getGuaranaFileId());
-        _context.getWorkspace().rename(ids, text);
-    }
+bool ok;
+QString text = QInputDialog::getText(this, tr("Rename"),
+                                     tr("New name:"), QLineEdit::Normal,
+                                     view->getFilename(), &ok);
+if (ok && !text.isEmpty())
+{
+    QList<int> ids;
+    for (auto index : indexes)
+        ids.append(_model.getModel().at(index.row())->getGuaranaFileId());
+    _context.getWorkspace().rename(ids, text);
+}
 
     updateFiles();
 }
@@ -429,7 +472,7 @@ void NavigationTab::pasteElements()
         while(it.hasNext())
         {
             it.next();
-            _context.getWorkspace().importFromWS(it.key(), *it.value(), _selectedTags.getModel(), true);
+            _context.getWorkspace().importFromWS(it.key(), *it.value(), _selectedTags, true);
             delete it.value();
         }
     }
@@ -438,7 +481,7 @@ void NavigationTab::pasteElements()
         while(it.hasNext())
         {
             it.next();
-            _context.getWorkspace().importFromWS(it.key(), *it.value(), _selectedTags.getModel(), false);
+            _context.getWorkspace().importFromWS(it.key(), *it.value(), _selectedTags, false);
             delete it.value();
         }
     }
@@ -473,10 +516,23 @@ void NavigationTab::editTags()
 
 void NavigationTab::newFromTemplate(QString & filepath)
 {
-    QStringList filesList;
-    filesList.append(filepath);
-    addFiles(filesList);
+    QFileInfo info(filepath);
+
+    bool ok;
+    QString newName = QInputDialog::getText(this, tr("Create file from template"),
+                                         tr("New name:"), QLineEdit::Normal,
+                                         info.fileName(), &ok);
+
+    if (!ok || newName.isEmpty())
+        return;
+
+    addFileAs(filepath, newName);
     updateFiles();
+}
+
+QString NavigationTab::getTitle() const
+{
+    return _title;
 }
 
 void NavigationTab::removeElements()
