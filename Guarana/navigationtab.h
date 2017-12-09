@@ -5,6 +5,7 @@
 #include <QAbstractTableModel>
 #include <QCompleter>
 #include <QMenu>
+#include <QShortcut>
 
 #include <widgetmodels/filetablemodel.hpp>
 #include <widgetmodels/ptrlistmodel.hpp>
@@ -92,6 +93,8 @@ private:
 
     void cast(QList<QUrl> & urls, QMap<QString, QList<int>*> & workspaces);
 
+    void configureShortcuts();
+
 protected:
 
     void dragEnterEvent(QDragEnterEvent *event) override;
@@ -140,6 +143,8 @@ private slots:
 
     void on_resultTable_doubleClicked(const QModelIndex &index);
 
+    void on_actionDelete_triggered();
+
 private:
 
     Ui::NavigationTab *ui;
@@ -159,6 +164,16 @@ private:
     NavigationTabListener * _listener;
 
     QString _title;
+
+    QShortcut * _shortcutDelete;
+
+    QShortcut * _shortcutCut;
+
+    QShortcut * _shortcutCopy;
+
+    QShortcut * _shortcutPaste;
+
+    QShortcut * _shortcutRename;
 
 };
 

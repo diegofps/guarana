@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>321</width>
-    <height>196</height>
+    <width>593</width>
+    <height>267</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -107,5 +107,42 @@
   </layout>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>btNewPage</sender>
+   <signal>clicked()</signal>
+   <receiver>NavigationForm2</receiver>
+   <slot>newTab()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>17</x>
+     <y>24</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>5</x>
+     <y>37</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btClosePage</sender>
+   <signal>clicked()</signal>
+   <receiver>NavigationForm2</receiver>
+   <slot>closeTab()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>576</x>
+     <y>21</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>590</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>newTab()</slot>
+  <slot>closeTab()</slot>
+ </slots>
 </ui>

@@ -250,7 +250,27 @@
     </widget>
    </item>
   </layout>
+  <action name="actionDelete">
+   <property name="text">
+    <string>Delete</string>
+   </property>
+   <property name="toolTip">
+    <string>Delete</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Del</string>
+   </property>
+  </action>
  </widget>
+ <tabstops>
+  <tabstop>tagFilter</tabstop>
+  <tabstop>btClearTagFilter</tabstop>
+  <tabstop>textFilter</tabstop>
+  <tabstop>btClearTextFilter</tabstop>
+  <tabstop>tagsList</tabstop>
+  <tabstop>resultTable</tabstop>
+  <tabstop>listView</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

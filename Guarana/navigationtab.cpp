@@ -10,6 +10,7 @@
 #include <QInputDialog>
 #include <QClipboard>
 #include <QUrlQuery>
+#include <QShortcut>
 
 NavigationTab::NavigationTab(Context & context, NavigationTabListener * listener, int id, QWidget *parent) :
     QWidget(parent),
@@ -28,6 +29,7 @@ NavigationTab::NavigationTab(Context & context, NavigationTabListener * listener
     configureTagFilter();
     configureTagList();
     configureResultTable();
+    configureShortcuts();
 
     _context.getWorkspace().getDB().getTagManager().getAll(_tagOptions);
     _tagOptions.refresh();
@@ -38,7 +40,27 @@ NavigationTab::NavigationTab(Context & context, NavigationTabListener * listener
 
 NavigationTab::~NavigationTab()
 {
+    delete _shortcutDelete;
+    delete _shortcutCut;
+    delete _shortcutCopy;
+    delete _shortcutPaste;
+    delete _shortcutRename;
     delete ui;
+}
+
+void NavigationTab::configureShortcuts()
+{
+    _shortcutDelete = new QShortcut(QKeySequence("Del"), this);
+    _shortcutCut = new QShortcut(QKeySequence("Ctrl+X"), this);
+    _shortcutCopy = new QShortcut(QKeySequence("Ctrl+C"), this);
+    _shortcutPaste = new QShortcut(QKeySequence("Ctrl+V"), this);
+    _shortcutRename = new QShortcut(QKeySequence("Ctrl+R"), this);
+
+    connect(_shortcutDelete, SIGNAL(activated()), this, SLOT(removeElements()));
+    connect(_shortcutCut, SIGNAL(activated()), this, SLOT(cutElements()));
+    connect(_shortcutCopy, SIGNAL(activated()), this, SLOT(copyElements()));
+    connect(_shortcutPaste, SIGNAL(activated()), this, SLOT(pasteElements()));
+    connect(_shortcutRename, SIGNAL(activated()), this, SLOT(renameElements()));
 }
 
 void NavigationTab::configureResultTable()
@@ -565,4 +587,9 @@ void NavigationTab::on_resultTable_doubleClicked(const QModelIndex &index)
     QString filepath = _context.getWorkspace().getFilePath(gfile);
     QUrl url = QUrl::fromLocalFile(filepath);
     QDesktopServices::openUrl(url);
+}
+
+void NavigationTab::on_actionDelete_triggered()
+{
+    removeElements();
 }

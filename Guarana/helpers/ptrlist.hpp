@@ -29,6 +29,13 @@ public:
         QList<T*>::clear();
     }
 
+    void removeAt(int i)
+    {
+        if (_ownsData)
+            delete this->at(i);
+        QList<T*>::removeAt(i);
+    }
+
 private:
 
     void deleteElements()

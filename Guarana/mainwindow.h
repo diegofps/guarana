@@ -58,6 +58,8 @@ private slots:
 
     void on_actionQuit_triggered();
 
+    void on_actionCut_triggered();
+
 private:
 
     Ui::MainWindow *ui;

@@ -19,6 +19,10 @@ private:
 
     void createTab();
 
+    void navigateTab(const int relativeIndex);
+
+    void configureShortcuts();
+
 public:
 
     explicit NavigationForm2(Context & context, QWidget *parent = 0);
@@ -31,11 +35,15 @@ public:
 
 private slots:
 
-    void on_btNewPage_clicked();
+    void newTab();
 
-    void on_btClosePage_clicked();
+    void closeTab();
 
     void on_cbPages_activated(int index);
+
+    void nextTab();
+
+    void previousTab();
 
 private:
 
@@ -46,6 +54,14 @@ private:
     Context & _context;
 
     int _id;
+
+    QShortcut * _shortcutNewTab;
+
+    QShortcut * _shortcutCloseTab;
+
+    QShortcut * _shortcutNextTab;
+
+    QShortcut * _shortcutPreviousTab;
 
 };
 

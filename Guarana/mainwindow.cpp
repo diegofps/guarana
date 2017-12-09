@@ -101,3 +101,8 @@ void MainWindow::on_actionQuit_triggered()
 {
     close();
 }
+
+void MainWindow::on_actionCut_triggered()
+{
+    qDebug() << "Cut";
+}

@@ -16,12 +16,6 @@ public:
 
     }
 
-    void removeAt(int i)
-    {
-        PtrList<ItemType>::removeAt(i);
-        refresh();
-    }
-
     int rowCount(const QModelIndex & /*parent*/) const
     {
         return this->size();
@@ -51,7 +45,17 @@ public:
         emit layoutChanged();
     }
 
-    virtual
+    void clear()
+    {
+        PtrList<ItemType>::clear();
+        refresh();
+    }
+
+    void removeAt(int i)
+    {
+        PtrList<ItemType>::removeAt(i);
+        refresh();
+    }
 
     ItemType * getOrNull(const QString & name)
     {
