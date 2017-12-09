@@ -29,7 +29,7 @@ public:
             decodeModel(query, tag);
     }
 
-    void getAll(PtrList<Tag> tags)
+    void getAll(PtrList<Tag> & tags)
     {
         tags.clear();
 

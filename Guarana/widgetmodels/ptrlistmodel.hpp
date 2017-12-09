@@ -1,6 +1,7 @@
 #ifndef TAGLISTMODEL_HPP
 #define TAGLISTMODEL_HPP
 
+#include<QDebug>
 #include <QAbstractTableModel>
 
 #include <helpers/ptrlist.hpp>
@@ -19,6 +20,11 @@ public:
     int rowCount(const QModelIndex & /*parent*/) const
     {
         return this->size();
+    }
+
+    int columnCount(const QModelIndex & /*parent*/)
+    {
+        return 1;
     }
 
     bool contains(QString & name) const

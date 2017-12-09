@@ -19,7 +19,7 @@ NavigationTab::NavigationTab(Context & context, NavigationTabListener * listener
     _tagOptions(&Tag::getName),
     _context(context),
     _id(id),
-    _tagCompleter(&_tagOptions),
+    _tagCompleter(&_tagOptions, this),
     _listener(listener)
 {
     ui->setupUi(this);
@@ -30,9 +30,6 @@ NavigationTab::NavigationTab(Context & context, NavigationTabListener * listener
     configureTagList();
     configureResultTable();
     configureShortcuts();
-
-    _context.getWorkspace().getDB().getTagManager().getAll(_tagOptions);
-    _tagOptions.refresh();
 
     updateFiles();
     updateTitle();
@@ -92,10 +89,17 @@ void NavigationTab::configureTagFilter()
 //    QStringList wordList;
 //    wordList << "alpha" << "omega" << "omicron" << "zeta";
 
-//    QCompleter *completer = new QCompleter(wordList, this);
+//    _context.getWorkspace().getDB().getTagManager().getAll(_tagOptions);
+
+//    QCompleter *completer = new QCompleter(&_tagOptions, this);
 //    completer->setCaseSensitivity(Qt::CaseInsensitive);
+//    completer->setCompletionRole(Qt::DisplayRole);
 
 //    ui->tagFilter->setCompleter(completer);
+
+    _context.getWorkspace().getDB().getTagManager().getAll(_tagOptions);
+    _tagCompleter.setCaseSensitivity(Qt::CaseInsensitive);
+    _tagCompleter.setCompletionRole(Qt::DisplayRole);
     ui->tagFilter->setCompleter(&_tagCompleter);
 }
 
