@@ -45,7 +45,7 @@ public:
             return QVariant();
     }
 
-    void refresh()
+    void notifyContentChanged()
     {
         emit dataChanged(createIndex(0, 0), createIndex(this->size(), 1));
         emit layoutChanged();
@@ -54,13 +54,13 @@ public:
     void clear()
     {
         PtrList<ItemType>::clear();
-        refresh();
+        notifyContentChanged();
     }
 
     void removeAt(int i)
     {
         PtrList<ItemType>::removeAt(i);
-        refresh();
+        notifyContentChanged();
     }
 
     ItemType * getOrNull(const QString & name)

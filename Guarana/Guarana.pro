@@ -71,7 +71,8 @@ HEADERS += \
     widgetmodels/filetablemodel.hpp \
     helpers/randomhelper.hpp \
     helpers/filemap.hpp \
-    widgetmodels/ptrlistmodel.hpp
+    widgetmodels/ptrlistmodel.hpp \
+    helpers/displayhelper.hpp
 
 FORMS += \
     mainwindow.ui \

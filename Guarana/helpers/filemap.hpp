@@ -75,7 +75,7 @@ public:
 
             if (info.isSymLink() || current.endsWith("/.") || current.endsWith("/.."))
             {
-                qDebug() << "Ignoring " << current;
+//                qDebug() << "Ignoring " << current;
                 continue;
             }
 
@@ -84,20 +84,20 @@ public:
             {
                 if (info.baseName().startsWith("_"))
                 {
-                    qDebug() << "Parsing folder as single entity " << current;
+//                    qDebug() << "Parsing folder as single entity " << current;
                     QString basename = info.baseName();
                     child = new FileMap(basename.mid(1, basename.length()), current, false);
                 }
                 else
                 {
-                    qDebug() << "Parsing folder " << current;
+//                    qDebug() << "Parsing folder " << current;
                     child = new FileMap(info.fileName(), current, true);
                     child->addFolder(current, allowFolders);
                 }
             }
             else
             {
-                qDebug() << "Parsing file " << current;
+//                qDebug() << "Parsing file " << current;
                 child = new FileMap(info.fileName(), current, false);
             }
 

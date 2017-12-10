@@ -19,7 +19,7 @@ public:
 
     }
 
-    void refresh()
+    void notifyContentChanged()
     {
         emit dataChanged(createIndex(0, 0), createIndex(_models.size()-1, 3));
         emit layoutChanged();

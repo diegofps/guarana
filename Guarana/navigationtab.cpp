@@ -12,6 +12,8 @@
 #include <QUrlQuery>
 #include <QShortcut>
 
+#include <helpers/displayhelper.hpp>
+
 NavigationTab::NavigationTab(Context & context, NavigationTabListener * listener, int id, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::NavigationTab),
@@ -126,7 +128,7 @@ void NavigationTab::updateFiles()
                 ui->textFilter->text(),
                 _model.getModel(),
                 true);
-    _model.refresh();
+    _model.notifyContentChanged();
 }
 
 void NavigationTab::updateTitle()
@@ -321,26 +323,7 @@ void NavigationTab::showContextMenu(const QPoint & pos)
     contextMenu.addSeparator();
     contextMenu.addAction(&remove);
 
-    // Cria um novo ponto fazendo a translação para o QTableView
-
-//    Abordagem antiga
-//    QPoint p2(pos.x() + ui->resultTable->x() + ui->splitter->x(),
-//              pos.y() + ui->resultTable->y() + ui->splitter->y());
-
-//    Nova abordagem
-    QPoint p2(pos.x(), pos.y());
-    QWidget *current = ui->resultTable;
-    while(current != nullptr && current != this)
-    {
-        p2.setX(p2.x() + current->x());
-        p2.setY(p2.y() + current->y());
-        current = current->parentWidget();
-    }
-
-    qDebug() << "Context started";
-    contextMenu.exec(mapToGlobal(p2));
-    qDebug() << "Context ended";
-
+    contextMenu.exec(ui->resultTable->mapToGlobal(pos));
 }
 
 void NavigationTab::on_tagFilter_returnPressed()
@@ -354,7 +337,7 @@ void NavigationTab::on_tagFilter_returnPressed()
     if (!_selectedTags.contains(tagName))
     {
         _selectedTags.append(tag);
-        _selectedTags.refresh();
+        _selectedTags.notifyContentChanged();
         updateFiles();
         updateTitle();
     }
@@ -383,7 +366,7 @@ void NavigationTab::on_textFilter_returnPressed()
 void NavigationTab::on_tagsList_doubleClicked(const QModelIndex &index)
 {
     _selectedTags.removeAt(index.row());
-    _selectedTags.refresh();
+    _selectedTags.notifyContentChanged();
     updateFiles();
     updateTitle();
 }

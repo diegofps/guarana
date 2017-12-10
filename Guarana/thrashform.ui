@@ -13,16 +13,97 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QHBoxLayout" name="horizontalLayout">
+  <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QLabel" name="label">
+     <property name="styleSheet">
+      <string notr="true">font: 75 18pt &quot;Noto Sans&quot;;
+color: #ff2c4159;</string>
+     </property>
      <property name="text">
-      <string>Thrash form</string>
+      <string>Removed Items</string>
+     </property>
+     <property name="margin">
+      <number>10</number>
      </property>
     </widget>
+   </item>
+   <item>
+    <widget class="QTableView" name="garbageList"/>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <property name="spacing">
+      <number>12</number>
+     </property>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btRecoverAll">
+       <property name="text">
+        <string>Recover All</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btClearThrash">
+       <property name="text">
+        <string>Clear Thrash</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>btRecoverAll</sender>
+   <signal>clicked()</signal>
+   <receiver>ThrashForm</receiver>
+   <slot>recoverAll()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>216</x>
+     <y>281</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>253</x>
+     <y>294</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btClearThrash</sender>
+   <signal>clicked()</signal>
+   <receiver>ThrashForm</receiver>
+   <slot>eraseAll()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>377</x>
+     <y>274</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>396</x>
+     <y>273</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>eraseAll()</slot>
+  <slot>recoverAll()</slot>
+ </slots>
 </ui>

@@ -36,6 +36,13 @@ public:
         QList<T*>::removeAt(i);
     }
 
+    void sort()
+    {
+        std::sort(this->begin(), this->end(), [](T * p1, T * p2) {
+            return *p1 < *p2;
+        });
+    }
+
 private:
 
     void deleteElements()

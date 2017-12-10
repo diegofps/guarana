@@ -23,6 +23,14 @@ private:
 
 public:
 
+    bool operator<(const FileViewModel & other)
+    {
+        if ( isDir() == other.isDir())
+            return getFilename() < other.getFilename();
+        else
+            return isDir();
+    }
+
     int getGuaranaFileId() const
     {
         return _guaranaFileId;
@@ -53,7 +61,7 @@ public:
         return _creatDate;
     }
 
-    bool isDir()
+    bool isDir() const
     {
         return _isDir;
     }

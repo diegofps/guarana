@@ -239,12 +239,15 @@ public:
 
         // Cast the files to the corresponding viewmodel
         Merlin::castList(gfiles, result, _workspace);
-        std::sort(result.begin(), result.end(), [](FileViewModel * p1, FileViewModel * p2) {
-            if ( p1->isDir() == p2->isDir())
-                return p1->getFilename() < p2->getFilename();
-            else
-                return p1->isDir();
-        });
+        result.sort();
+    }
+
+    void getRemovedItems(PtrList<FileViewModel> & result)
+    {
+        PtrList<GuaranaFile> gfiles;
+        _db->getGuaranaFileManager().getRemovedFiles(gfiles);
+        Merlin::castList(gfiles, result, _workspace);
+        result.sort();
     }
 
     QString getFileLocation(GuaranaFile & gfile) const

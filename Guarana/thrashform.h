@@ -3,6 +3,9 @@
 
 #include <QWidget>
 
+#include <widgetmodels/filetablemodel.hpp>
+#include <widgetmodels/ptrlistmodel.hpp>
+
 #include "helpers/context.hpp"
 
 namespace Ui {
@@ -22,9 +25,29 @@ public:
 
 private:
 
+    void configureGarbageList();
+
+private slots:
+
+    void showContextMenu(const QPoint &pos);
+
+    void eraseAll();
+
+    void recoverAll();
+
+    void recoverSelected();
+
+    void eraseSelected();
+
+    void updateList();
+
+private:
+
     Ui::ThrashForm *ui;
 
     Context & _context;
+
+    FileTableModel _modelHolder;
 
 };
 

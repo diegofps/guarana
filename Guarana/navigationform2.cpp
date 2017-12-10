@@ -39,7 +39,7 @@ void NavigationForm2::configureShortcuts()
 
 void NavigationForm2::onTitleChanged(NavigationTab * /*tab*/, QString & /*newTitle*/)
 {
-    _tabs.refresh();
+    _tabs.notifyContentChanged();
 }
 
 void NavigationForm2::newTab()
@@ -52,7 +52,7 @@ void NavigationForm2::newTab()
 
     int index = _tabs.count() - 1;
 
-    _tabs.refresh();
+    _tabs.notifyContentChanged();
     ui->stackedPages->addWidget(tab);
     ui->stackedPages->setCurrentIndex(index);
     ui->cbPages->addItem("Unnamed tab " + QString::number(_id));

@@ -87,18 +87,29 @@ public:
         if (!textFilter.isEmpty())
             wheres.append(QString("filename LIKE '%%1%'").arg(textFilter));
 
-
         QSqlQuery query;
         if (wheres.isEmpty())
-            query.prepare("SELECT " + SELECT_FIELDS + " FROM GuaranaFiles f");
+            query.prepare("SELECT " + SELECT_FIELDS + " FROM GuaranaFiles f LIMIT 1000");
         else
-            query.prepare("SELECT " + SELECT_FIELDS + " FROM GuaranaFiles f WHERE " + wheres.join(" AND "));
+            query.prepare("SELECT " + SELECT_FIELDS + " FROM GuaranaFiles f WHERE " + wheres.join(" AND ") + " LIMIT 1000");
 
         qDebug() << "Query:" << query.lastQuery();
 
         queryMany(query);
         while(query.next())
             gfiles.append(decodeModel(query));
+    }
+
+    void getRemovedFiles(PtrList<GuaranaFile> & results)
+    {
+        results.clear();
+
+        QSqlQuery query;
+        query.prepare("SELECT " + SELECT_FIELDS + " FROM GuaranaFiles WHERE isAlive=1");
+
+        queryMany(query);
+        while(query.next())
+            results.append(decodeModel(query));
     }
 
     QSqlQuery & encodeModel(QSqlQuery & query, GuaranaFile & model)
