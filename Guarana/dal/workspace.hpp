@@ -83,6 +83,57 @@ public:
         manager.update(file);
     }
 
+    void destroyFiles(const QList<int> & ids)
+    {
+        GuaranaFileManager & manager = _db->getGuaranaFileManager();
+        GuaranaFile file;
+
+        _db->transaction();
+
+        for (int id : ids)
+        {
+            manager.getById(id, file);
+
+            if (file.getId() == 0)
+            {
+                qDebug() << "File not found: " << id;
+                continue;
+            }
+
+            QString fileLocation = getFileLocation(file);
+            if (!QDir(fileLocation).removeRecursively())
+                qDebug() << "Could not remove folder " << fileLocation;
+        }
+
+        manager.destroyAll(ids);
+
+        _db->commit();
+    }
+
+    void recoverFilesFromThrash(const QList<int> & ids)
+    {
+        GuaranaFileManager & manager = _db->getGuaranaFileManager();
+        GuaranaFile file;
+
+        _db->transaction();
+
+        for (int id : ids)
+        {
+            manager.getById(id, file);
+
+            if (file.getId() == 0)
+            {
+                qDebug() << "File not found: " << id;
+                continue;
+            }
+
+            file.setIsAlive(true);
+            manager.update(file);
+        }
+
+        _db->commit();
+    }
+
     void rename(QList<int> ids, QString & newName)
     {
         GuaranaFileManager & manager = _db->getGuaranaFileManager();
@@ -296,11 +347,15 @@ public:
         PtrList<GuaranaFile> gfiles;
         gfm.getRemovedFiles(gfiles);
 
+        _db->transaction();
+
         for (auto & gfile : gfiles)
         {
             gfile->setIsAlive(true);
             gfm.update(*gfile);
         }
+
+        _db->commit();
     }
 
 };

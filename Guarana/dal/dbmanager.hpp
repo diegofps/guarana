@@ -72,6 +72,21 @@ public:
 
     }
 
+    void transaction()
+    {
+        _db.transaction();
+    }
+
+    void commit()
+    {
+        _db.commit();
+    }
+
+    void rollback()
+    {
+        _db.rollback();
+    }
+
     GuaranaFileManager & getGuaranaFileManager()
     {
         return _GuaranaFileManager;

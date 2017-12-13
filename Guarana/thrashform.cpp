@@ -67,6 +67,12 @@ void ThrashForm::recoverAll()
 void ThrashForm::recoverSelected()
 {
     qDebug() << "Recover selected";
+    QList<int> ids;
+
+    for (auto & index : ui->garbageList->selectionModel()->selectedRows())
+        ids.append(_modelHolder.getModel().at(index.row())->getGuaranaFileId());
+
+    _context.getWorkspace().recoverFilesFromThrash(ids);
 
     updateList();
 }
@@ -74,6 +80,11 @@ void ThrashForm::recoverSelected()
 void ThrashForm::eraseSelected()
 {
     qDebug() << "Erase selected";
+    QList<int> ids;
+
+    for (auto & index : ui->garbageList->selectionModel()->selectedRows())
+        ids.append(_modelHolder.getModel().at(index.row())->getGuaranaFileId());
+    _context.getWorkspace().destroyFiles(ids);
 
     updateList();
 }

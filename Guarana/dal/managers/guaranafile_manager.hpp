@@ -40,7 +40,7 @@ public:
         exec(encodeModel(query, file));
     }
 
-    void destroyAll(QList<int> & ids)
+    void destroyAll(const QList<int> & ids)
     {
         if (ids.isEmpty())
             return;
