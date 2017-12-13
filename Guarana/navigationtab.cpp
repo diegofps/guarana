@@ -556,6 +556,7 @@ void NavigationTab::removeElements()
         qDebug() << index.row() << ", " << index.column() << ": " << ptr->getFilename();
     }
 
+    ui->resultTable->clearSelection();
     updateFiles();
 }
 

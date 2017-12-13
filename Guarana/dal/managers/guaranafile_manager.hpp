@@ -105,7 +105,7 @@ public:
         results.clear();
 
         QSqlQuery query;
-        query.prepare("SELECT " + SELECT_FIELDS + " FROM GuaranaFiles WHERE isAlive=1");
+        query.prepare("SELECT " + SELECT_FIELDS + " FROM GuaranaFiles WHERE isAlive=0");
 
         queryMany(query);
         while(query.next())

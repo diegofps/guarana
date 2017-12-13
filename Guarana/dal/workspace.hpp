@@ -270,6 +270,39 @@ public:
         return _workspace;
     }
 
+    void emptyThrash()
+    {
+        GuaranaFileManager & gfm = _db->getGuaranaFileManager();
+        PtrList<GuaranaFile> gfiles;
+        QList<int> destroyList;
+
+        gfm.getRemovedFiles(gfiles);
+
+        for (auto & gfile : gfiles)
+        {
+            QString fileLocation = getFileLocation(*gfile);
+            if (QDir(fileLocation).removeRecursively())
+                destroyList.append(gfile->getId());
+            else
+                qDebug() << "Could not remove folder " << fileLocation;
+        }
+
+        gfm.destroyAll(destroyList);
+    }
+
+    void recoverThrash()
+    {
+        GuaranaFileManager & gfm = _db->getGuaranaFileManager();
+        PtrList<GuaranaFile> gfiles;
+        gfm.getRemovedFiles(gfiles);
+
+        for (auto & gfile : gfiles)
+        {
+            gfile->setIsAlive(true);
+            gfm.update(*gfile);
+        }
+    }
+
 };
 
 #endif // WORKSPACE_H
